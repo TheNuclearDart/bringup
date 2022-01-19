@@ -42,10 +42,10 @@ reset_handler:
    ldr r2, =_sidata
    movs r3, #0 /* Incrementing offset */
    bl LoopCopyDataSection
-   //bl SystemInit /* System init function (if needed, I think this is CMSIS) */
-   //bl __libc_init_array /* Init libc (dunno how this works yet) */
+   bl SystemInit /* System init function (if needed, I think this is CMSIS) */
+   bl __libc_init_array /* Init libc (dunno how this works yet) */
 
-   //bl main /* Jump to application! */
+   bl main /* Jump to application! */
    b Infinite_Loop
    /* Need to do something here if main returns eventually */
 .size reset_handler, .-reset_handler

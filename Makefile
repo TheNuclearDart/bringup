@@ -4,12 +4,24 @@
 #########################################################
 
 # Basic config - target, optimization, build output dir
-TARGET = Blink
+TARGET = blink
 
 DEBUG = 1
 OPT = -Og
 
 BUILD_DIR = build
+
+# cpu
+CPU = -mcpu=cortex-m7
+
+# fpu
+FPU = -mfpu=fpv5-sp-d16
+
+# float-abi
+FLOAT-ABI = -mfloat-abi=hard
+
+# mcu
+MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 
 # Build tools
 # g++ instead of gcc for c++
@@ -17,11 +29,13 @@ BUILD_DIR = build
 PREFIX = arm-none-eabi-
 ifdef GCC_PATH #Can be defined in scripts to use a different gcc
 CC = $(GCC_PATH)/$(PREFIX)g++
+CXX = $(GCC_PATH)/$(PREFIX)g++
 AS = $(GCC_PATH)/$(PREFIX)g++ -x assembler-with-cpp
 CP = $(GCC_PATH)/$(PREFIX)objcopy
 SZ = $(GCC_PATH)/$(PREFIX)size
 else
 CC = $(PREFIX)g++
+CXX = $(PREFIX)g++
 AS = $(PREFIX)g++ -x assembler-with-cpp
 CP = $(PREFIX)objcopy
 SZ = $(PREFIX)size
@@ -29,7 +43,30 @@ endif
 HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
 
+# C Defines
+C_DEFS = \
+-DSTM32F746xx \
+
+# C Includes
+C_INCLUDES = \
+-ICore/Inc \
+-IDrivers/CMSIS/Include \
+-IDrivers/CMSIS/Device/ST/STM32F7xx/Include
+
 # C Source
+C_SOURCES = \
+drivers/CMSIS/Device/ST/STM32F7xx/Source/Templates/system_stm32f7xx.c \
+
+# C++ Includes
+CXX_INCLUDES = \
+-ICore/Inc \
+-IDrivers/CMSIS/Include \
+-IDrivers/CMSIS/Device/ST/STM32F7xx/Include
+
+# C++ Source
+CXX_SOURCES = \
+core/src/main.cpp \
+
 # ASM Source
 ASM_SOURCES = \
 startup.s
@@ -38,14 +75,17 @@ startup.s
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
 
 CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+CXXFLAGS = $(CFLAGS)
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2
+CXXFLAGS += -g -gdwarf-2
 endif
 
 
 # Generate dependency information
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
+CXXFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 
 
 #######################################
@@ -69,12 +109,17 @@ all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET
 # list of objects
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(C_SOURCES)))
+OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(CXX_SOURCES:.cpp=.o)))
+vpath %.cpp $(sort $(dir $(CXX_SOURCES)))
 # list of ASM program objects
 OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
 
 $(BUILD_DIR)/%.o: %.c Makefile | $(BUILD_DIR) 
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
+
+$(BUILD_DIR)/%.o: %.cpp Makefile | $(BUILD_DIR) 
+	$(CXX) -c $(CXXFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.cpp=.lst)) $< -o $@
 
 $(BUILD_DIR)/%.o: %.s Makefile | $(BUILD_DIR)
 	$(AS) -c $(CFLAGS) $< -o $@
