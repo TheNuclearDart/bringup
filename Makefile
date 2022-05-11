@@ -49,7 +49,7 @@ C_DEFS = \
 
 # C Includes
 C_INCLUDES = \
--ICore/Inc \
+-ICore/board_defines/inc \
 -IDrivers/CMSIS/Include \
 -IDrivers/CMSIS/Device/ST/STM32F7xx/Include\
 -IDrivers/STM32F7xx_HAL_Driver/Inc/ \
@@ -62,16 +62,18 @@ drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.c \
+core/stm32f7xx_hal_msp.c \
 
 # C++ Includes
 CXX_INCLUDES = \
--ICore/Inc \
+-ICore/board_defines/inc \
 -IDrivers/CMSIS/Include \
 -IDrivers/CMSIS/Device/ST/STM32F7xx/Include
 
 # C++ Source
 CXX_SOURCES = \
-core/src/main.cpp \
+core/main.cpp \
+core/print/src/print.cpp \
 
 # ASM Source
 ASM_SOURCES = \
