@@ -11,7 +11,7 @@ MEMORY
    DTCM (xrw) : ORIGIN = 0x20000000, LENGTH = 64K
    SRAM (xrw) : ORIGIN = 0x20010000, LENGTH = 240K
    FLASH (xr) : ORIGIN = 0x08000000, LENGTH = 1024K
-   /* Needs external RAM (if it exists on the board?) */
+   /* Needs external RAM (if it exists on the board? 5-11-22 it does, but it needs to be added) */
 }
 
 SECTIONS
@@ -47,12 +47,17 @@ SECTIONS
       . = ALIGN(4);
    } > FLASH
 
-     .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >FLASH
-  .ARM : {
-    __exidx_start = .;
-    *(.ARM.exidx*)
-    __exidx_end = .;
-  } >FLASH
+   .ARM.extab : 
+   { 
+      *(.ARM.extab* .gnu.linkonce.armextab.*) 
+   } > FLASH
+  
+  .ARM : 
+  {
+      __exidx_start = .;
+      *(.ARM.exidx*)
+      __exidx_end = .;
+  } > FLASH
 
   /* These are things I need to understand */
   .preinit_array :
