@@ -51,11 +51,17 @@ C_DEFS = \
 C_INCLUDES = \
 -ICore/Inc \
 -IDrivers/CMSIS/Include \
--IDrivers/CMSIS/Device/ST/STM32F7xx/Include
+-IDrivers/CMSIS/Device/ST/STM32F7xx/Include\
+-IDrivers/STM32F7xx_HAL_Driver/Inc/ \
 
 # C Source
 C_SOURCES = \
 drivers/CMSIS/Device/ST/STM32F7xx/Source/Templates/system_stm32f7xx.c \
+drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.c \
+drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.c \
+drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.c \
+drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.c \
+drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.c \
 
 # C++ Includes
 CXX_INCLUDES = \
@@ -74,7 +80,7 @@ startup.s
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
 
-CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections -fno-exceptions -fno-rtti
 CXXFLAGS = $(CFLAGS)
 
 ifeq ($(DEBUG), 1)

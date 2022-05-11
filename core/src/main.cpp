@@ -3,14 +3,13 @@
  ************************************/
 
 #include <stdint.h>
+#include "stm32f7xx_hal.h"
 
 int main(void)
 {
+   HAL_Init(); // Init ST Provided HAL
    while (1)
    {
-      for (uint32_t test = 0; test < UINT32_MAX; test++)
-      {
-      }
    }
 
    return 1;
