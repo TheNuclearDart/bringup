@@ -50,6 +50,7 @@ C_DEFS = \
 # C Includes
 C_INCLUDES = \
 -ICore/board_defines/inc \
+-ICore/interrupts/inc \
 -ICore/print/inc \
 -IDrivers/CMSIS/Include \
 -IDrivers/CMSIS/Device/ST/STM32F7xx/Include\
@@ -57,16 +58,21 @@ C_INCLUDES = \
 
 # C Source
 C_SOURCES = \
+core/interrupts/src/stm32f7xx_it.c \
+core/stm32f7xx_hal_msp.c \
+core/stm32f7xx_hal_timebase_tim.c \
 drivers/CMSIS/Device/ST/STM32F7xx/Source/Templates/system_stm32f7xx.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.c \
+drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_hcd.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.c \
+drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.c \
+drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.c \
-core/stm32f7xx_hal_msp.c \
 
 # C++ Includes
 CXX_INCLUDES = \

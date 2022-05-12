@@ -3,16 +3,69 @@
 #include "gpio_defines.h"
 #include "stm32f746xx.h"
 #include "stm32f7xx_hal_dma.h"
-#include "stm32f7xx_hal_gpio.h"
-#include "stm32f7xx_hal_gpio_ex.h"
-#include "stm32f7xx_hal_uart.h"
-#include "stm32f7xx_hal_rcc.h"
-#include "stm32f7xx_hal_rcc_ex.h"
+#include "stm32f7xx_hal_tim.h"
+#include "stm32f7xx_hal_conf.h"
 
 void HAL_MspInit(void)
 {
    __HAL_RCC_PWR_CLK_ENABLE();
    __HAL_RCC_SYSCFG_CLK_ENABLE();
+
+   HAL_NVIC_SetPriority(PendSV_IRQn, 15, 0); // Purpose??
+}
+
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim_base)
+{
+   // Borrowed from generated code. Likely needs some work
+   if (htim_base->Instance == TIM1)
+   {
+      __HAL_RCC_TIM1_CLK_ENABLE();
+   }
+   else if (htim_base->Instance == TIM2)
+   {
+      __HAL_RCC_TIM2_CLK_ENABLE();
+   }
+   else if (htim_base->Instance == TIM3)
+   {
+      __HAL_RCC_TIM3_CLK_ENABLE();
+   }
+   else if (htim_base->Instance == TIM5)
+   {
+      __HAL_RCC_TIM5_CLK_ENABLE();
+   }
+   else if (htim_base->Instance == TIM8)
+   {
+      __HAL_RCC_TIM8_CLK_ENABLE();
+   }
+}
+
+void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *htim_base)
+{
+   if(htim_base->Instance == TIM1)
+   {
+      /* Peripheral clock disable */
+      __HAL_RCC_TIM1_CLK_DISABLE();
+   }
+   else if (htim_base->Instance == TIM2)
+   {
+      /* Peripheral clock disable */
+      __HAL_RCC_TIM2_CLK_DISABLE();
+   }
+   else if (htim_base->Instance == TIM3)
+   {
+      /* Peripheral clock disable */
+      __HAL_RCC_TIM3_CLK_DISABLE();
+   }
+   else if (htim_base->Instance == TIM5)
+   {
+      /* Peripheral clock disable */
+      __HAL_RCC_TIM5_CLK_DISABLE();
+   }
+  else if (htim_base->Instance == TIM8)
+  {
+      /* Peripheral clock disable */
+      __HAL_RCC_TIM8_CLK_DISABLE();
+  }
 }
 
 void HAL_UART_MspInit(UART_HandleTypeDef *huart)
