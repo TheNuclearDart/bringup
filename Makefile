@@ -46,15 +46,20 @@ BIN = $(CP) -O binary -S
 # C Defines
 C_DEFS = \
 -DSTM32F746xx \
+-DUSE_HAL_DRIVER \
 
 # C Includes
 C_INCLUDES = \
 -ICore/board_defines/inc \
 -ICore/interrupts/inc \
 -ICore/print/inc \
+-ICore/usb_host/inc \
 -IDrivers/CMSIS/Include \
--IDrivers/CMSIS/Device/ST/STM32F7xx/Include\
--IDrivers/STM32F7xx_HAL_Driver/Inc/ \
+-IDrivers/CMSIS/Device/ST/STM32F7xx/Include \
+-IDrivers/STM32F7xx_HAL_Driver/Inc \
+-IDrivers/STM32F7xx_HAL_Driver/Inc/Legacy \
+-IThird_party/st_usb_host/Core/Inc \
+-IThird_party/st_usb_host/Class/CDC/Inc \
 
 # C Source
 C_SOURCES = \
@@ -73,18 +78,28 @@ drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.c \
 drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.c \
+third_party/st_usb_host/Core/Src/usbh_core.c \
+third_party/st_usb_host/Core/Src/usbh_ctlreq.c \
+third_party/st_usb_host/Core/Src/usbh_ioreq.c \
+third_party/st_usb_host/Core/Src/usbh_pipes.c \
 
 # C++ Includes
 CXX_INCLUDES = \
 -ICore/board_defines/inc \
 -ICore/print/inc \
+-ICore/usb_host/inc \
 -IDrivers/CMSIS/Include \
--IDrivers/CMSIS/Device/ST/STM32F7xx/Include
+-IDrivers/CMSIS/Device/ST/STM32F7xx/Include \
+-IDrivers/STM32F7xx_HAL_Driver/Inc \
+-IDrivers/STM32F7xx_HAL_Driver/Inc/Legacy \
+-IThird_party/st_usb_host/Core/Inc \
+-IThird_party/st_usb_host/Class/CDC/Inc \
 
 # C++ Source
 CXX_SOURCES = \
 core/main.cpp \
 core/print/src/print.cpp \
+core/usb_host/src/usb_host.cpp \
 
 # ASM Source
 ASM_SOURCES = \

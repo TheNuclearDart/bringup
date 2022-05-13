@@ -1,10 +1,9 @@
 /* @JDM code taken from STM32 example code */
 
 #include "gpio_defines.h"
-#include "stm32f746xx.h"
+#include "stm32f7xx.h"
 #include "stm32f7xx_hal_dma.h"
 #include "stm32f7xx_hal_tim.h"
-#include "stm32f7xx_hal_conf.h"
 
 void HAL_MspInit(void)
 {

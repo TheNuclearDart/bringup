@@ -1,5 +1,5 @@
 #include "print.h"
-#include "stm32f7xx_hal_uart.h"
+#include "stm32f7xx.h"
 
 /**
  * @brief Simple wrapper for setting up UART to print. Not sure this is the best way to do this

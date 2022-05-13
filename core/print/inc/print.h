@@ -1,8 +1,8 @@
 #ifndef __PRINT_H
 #define __PRINT_H
 
-#include "stm32f7xx_hal_dma.h"
-#include "stm32f7xx_hal_uart.h"
+#include "stm32f7xx.h"
+#include "stm32f7xx_hal.h"
 
 class Print
 {

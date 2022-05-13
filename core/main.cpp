@@ -6,7 +6,6 @@
 
 #include "stm32f746xx.h"
 #include "stm32f7xx_hal.h"
-#include "stm32f7xx_hal_conf.h"
 
 
 #include "print.h"
@@ -115,8 +114,9 @@ int main(void)
 
    while (1)
    {
-      print.out((uint8_t &)(data), 5); // None of this appears to work, but HAL_GetTick isn't setup properly. Need to init all the ISRs
-      HAL_Delay(100); // Not working; something is setup wrong with systick. Something isn't setup yet in terms of ISR. SysTick isn't working for some reason, getTick always returns 0.
+      // Going to replace this whole idea with just a printf redirect, which is better. Probably reuse the class as something to wrap the hw for printf
+      print.out((uint8_t &)(data), 5); // None of this appears to work, but HAL_GetTick isn't setup properly. Need to init all the ISRs.
+      HAL_Delay(10000); // Not working; something is setup wrong with systick. Something isn't setup yet in terms of ISR. SysTick isn't working for some reason, getTick always returns 0.
                       // Need to try using TIM6 instead of SysTick, but was having hang issues. Some weirdness with the inittick code, need to rework...
    }
 
