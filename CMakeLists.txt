@@ -10,7 +10,7 @@ set(TARGET blink)
 set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 set(LINKER_FILE "${CMAKE_CURRENT_LIST_DIR}/memory_layout.ld")
 message(STATUS "Linker Script: ${LINKER_FILE}")
-set(CMAKE_EXE_LINKER_FLAGS "-lc -lm -lnosys -specs=nano.specs -T ${LINKER_FILE} -Wl,-Map=${CMAKE_SOURCE_DIR}/build/memory_map.map,--cref -Wl,--gc-sections")
+set(CMAKE_EXE_LINKER_FLAGS "-lc -lm -lnosys -specs=nano.specs -T${LINKER_FILE} -Wl,-Map=${CMAKE_SOURCE_DIR}/build/memory_map.map,--cref -Wl,--gc-sections")
 
 # Source files
 set(SRC
@@ -47,4 +47,5 @@ add_compile_definitions(STM32F746xx USE_HAL_DRIVER)
 # add_subdirectory _after_ actions, so that subdirs inherit variables and such
 add_subdirectory(core/print)
 add_subdirectory(core/usb_host)
-target_link_libraries(${TARGET} print)
+target_link_libraries(${TARGET} print usb_host)
+add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-size ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.elf)
