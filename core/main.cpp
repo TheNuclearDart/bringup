@@ -10,6 +10,7 @@
 
 
 #include "print.h"
+#include "usb_host.h"
 
 // File local variables
 namespace
@@ -34,6 +35,7 @@ namespace
       }
    };
    Print print(uart1, UINT32_MAX); // Need to determine better timeout. Is uart1 what I want?
+   USB_Host usb;
 }
 
 // These need to live in a separate file, not sure where yet, maybe something with print.cpp
@@ -128,16 +130,32 @@ void SystemClock_Config(void)
    }
 }
 
+// Implementation of wrapper function for USB Host class. Not sure that this is the best way to do this.
+void USB_Host::userFuncWrapper(USBH_HandleTypeDef *pHostHandle, uint8_t id)
+{
+   usb.userFunc(pHostHandle, id);
+}
+
 int main(void)
 {
    HAL_Init(); // Init ST Provided HAL
    SystemClock_Config(); // Initialize system clocks
 
+   usb.start(); // Start USB host. Was initialized at declaration
+
    while (1)
    {
       // Going to replace this whole idea with just a printf redirect, which is better. Probably reuse the class as something to wrap the hw for printf
-      printf("Testing, I am a computer");
-      HAL_Delay(10000);
+      uint8_t data[] = "abc";
+      //data[1] = 'B';
+      //data[2] = '\r';
+      //data[3] = '\n';
+      print.outRaw(data, 3, UINT32_MAX);
+      //print.out((uint8_t)data[1], 1);
+      //print.out((uint8_t)data[2], 1);
+      //print.out((uint8_t)data[3], 1);
+      //printf("Testing, I am a computer \n");
+      HAL_Delay(1000);
    }
 
    return 1;
