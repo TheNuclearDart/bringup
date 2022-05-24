@@ -109,6 +109,7 @@ SECTIONS
    .stack (NOLOAD) :
    {
       . = ALIGN(8);
+      end = .;
       . = . + _min_heap_size;
       . = . + _min_stack_size;
       . = ALIGN(8);

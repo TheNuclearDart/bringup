@@ -133,17 +133,10 @@ int main(void)
    HAL_Init(); // Init ST Provided HAL
    SystemClock_Config(); // Initialize system clocks
 
-   char data[8] = {0};
-   data[0] = 'T';
-   data[1] = 'E';
-   data[2] = 'S';
-   data[3] = 'T';
-   data[4] = '\0';
-
    while (1)
    {
       // Going to replace this whole idea with just a printf redirect, which is better. Probably reuse the class as something to wrap the hw for printf
-      print.out((uint8_t &)(data), 5); // None of this appears to work
+      printf("Testing, I am a computer");
       HAL_Delay(10000);
    }
 
