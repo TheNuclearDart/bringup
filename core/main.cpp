@@ -303,15 +303,14 @@ int main(void)
    MX_GPIO_Init(); // This needs replacing or fixing, wasn't needed for UART like thought
 
    print.init();
+   printf("Print initialized!\r\n");
    //usb.start(); // Start USB host. Was initialized at declaration
 
+   printf("Initialization complete, beginning main loop\r\n");
+   uint32_t i = 0;
    while (1)
    {
-      // Going to replace this whole idea with just a printf redirect, which is better. Probably reuse the class as something to wrap the hw for printf
-      uint8_t data[] = "This is a test using print.out!!\n\r";
-      //print.outRaw(data, sizeof(data), 10);
-      print.out(data[0], sizeof(data)); // I don't think this is ideal
-      printf("This is a printf test\n\r");
+      printf("This is a printf test. i = %ld\r\n", i++);
       HAL_Delay(1000);
 
       //usb.process();
