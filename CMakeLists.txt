@@ -10,12 +10,13 @@ set(TARGET blink)
 set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 set(LINKER_FILE "${CMAKE_CURRENT_LIST_DIR}/memory_layout.ld")
 message(STATUS "Linker Script: ${LINKER_FILE}")
-set(CMAKE_EXE_LINKER_FLAGS "-lc -lm -lnosys -specs=nano.specs -specs=nosys.specs -T${LINKER_FILE} -Wl,-Map=${CMAKE_SOURCE_DIR}/build/memory_map.map,--cref -Wl,--gc-sections")
+set(CMAKE_EXE_LINKER_FLAGS "-lc -lm -lnosys -specs=nano.specs -T${LINKER_FILE} -Wl,-Map=${CMAKE_SOURCE_DIR}/build/memory_map.map,--cref -Wl,--gc-sections")
 
 # Source files
 set(SRC
    ${CMAKE_CURRENT_LIST_DIR}/startup.s
    ${CMAKE_CURRENT_LIST_DIR}/core/main.cpp
+   ${CMAKE_CURRENT_LIST_DIR}/core/syscalls.c
    ${CMAKE_CURRENT_LIST_DIR}/core/stm32f7xx_hal_msp.c
    ${CMAKE_CURRENT_LIST_DIR}/core/stm32f7xx_hal_timebase_tim.c
    ${CMAKE_CURRENT_LIST_DIR}/core/interrupts/src/stm32f7xx_it.c
@@ -34,6 +35,7 @@ add_executable(${TARGET} ${SRC})
 
 # Includes
 target_include_directories(blink PUBLIC 
+   ${CMAKE_CURRENT_LIST_DIR}/core/
    ${CMAKE_CURRENT_LIST_DIR}/core/board_defines/inc
    ${CMAKE_CURRENT_LIST_DIR}/core/interrupts/inc
    ${CMAKE_CURRENT_LIST_DIR}/drivers/CMSIS/Include
