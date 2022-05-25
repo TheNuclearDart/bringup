@@ -47,3 +47,13 @@ void USB_Host::userFunc(USBH_HandleTypeDef *pHostHandle, uint8_t id)
          break;
    }
 }
+
+void USB_Host::process(void)
+{
+   USBH_Process(&this->usbHostHandle);
+}
+
+void USB_Host::cdc_transmit(uint8_t *data, uint32_t size)
+{
+   USBH_CDC_Transmit(&this->usbHostHandle, data, size);
+}

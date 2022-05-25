@@ -10,7 +10,10 @@ Print::Print(UART_HandleTypeDef &uart, uint32_t timeout)
 {
    this->uartInstance = uart;
    this->timeout = timeout;
+}
 
+void Print::init(void)
+{
    HAL_UART_Init(&this->uartInstance);
 }
 

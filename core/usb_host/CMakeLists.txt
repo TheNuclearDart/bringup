@@ -2,7 +2,10 @@ set(TARGET usb_host)
 message(STATUS "Building ${TARGET} library")
 set(SRC
    ${CMAKE_CURRENT_LIST_DIR}/src/usbh_conf.c
+   ${CMAKE_CURRENT_LIST_DIR}/src/usbh_platform.c
    ${CMAKE_CURRENT_LIST_DIR}/src/usb_host.cpp
+   ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_hcd.c
+   ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_usb.c
    ${CMAKE_SOURCE_DIR}/third_party/st_usb_host/Class/CDC/Src/usbh_cdc.c
    ${CMAKE_SOURCE_DIR}/third_party/st_usb_host/Core/Src/usbh_core.c
    ${CMAKE_SOURCE_DIR}/third_party/st_usb_host/Core/Src/usbh_ctlreq.c

@@ -54,6 +54,9 @@ extern "C" {
 #define USBH_DEBUG_LEVEL                      0U
 #define USBH_USE_OS                           0U // @JDM change when switching to RTOS
 
+#define HOST_HS 		0
+#define HOST_FS 		1
+
 /** @defgroup USBH_Exported_Macros
   * @{
   */
