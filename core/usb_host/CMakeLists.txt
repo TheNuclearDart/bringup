@@ -23,3 +23,4 @@ target_include_directories(${TARGET} PUBLIC
    ${CMAKE_SOURCE_DIR}/third_party/st_usb_host/Core/Inc
    ${CMAKE_SOURCE_DIR}/third_party/st_usb_host/Class/CDC/Inc
 )
+target_link_libraries(${TARGET} assert)

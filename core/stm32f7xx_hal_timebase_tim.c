@@ -63,6 +63,9 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
    
   /* Compute the prescaler value to have TIM6 counter clock equal to 1MHz */
   uwPrescalerValue = (uint32_t) ((uwTimclock / 1000000) - 1);
+
+  // @JDM not sure what to do here
+  uwTickPrio = TICK_INT_PRIORITY;
   
   /* Initialize TIM6 */
   htim6.Instance = TIM6;

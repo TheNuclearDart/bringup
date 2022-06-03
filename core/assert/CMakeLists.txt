@@ -1,8 +1,7 @@
-set(TARGET lcd)
+set(TARGET assert)
 message(STATUS "Building ${TARGET} library")
 set(SRC
-   ${CMAKE_CURRENT_LIST_DIR}/src/lcd.cpp
-   ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_ltdc.c
+   ${CMAKE_CURRENT_LIST_DIR}/src/assert.cpp
 )
 add_library(${TARGET} ${SRC})
 
@@ -14,4 +13,3 @@ target_include_directories(${TARGET} PUBLIC
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Inc
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Legacy
 )
-target_link_libraries(${TARGET} assert)

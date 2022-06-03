@@ -47,8 +47,9 @@ target_include_directories(blink PUBLIC
 add_compile_definitions(STM32F746xx USE_HAL_DRIVER USE_FULL_ASSERT)
 
 # add_subdirectory _after_ actions, so that subdirs inherit variables and such
+add_subdirectory(core/assert)
 add_subdirectory(core/print)
 add_subdirectory(core/usb_host)
 add_subdirectory(core/lcd)
-target_link_libraries(${TARGET} print usb_host lcd)
+target_link_libraries(${TARGET} assert print usb_host lcd)
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-size ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.elf)

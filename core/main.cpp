@@ -307,6 +307,7 @@ int main(void)
    while (1)
    {
       printf("This is a printf test. i = %ld\r\n", i++);
+      assert_msg(i <= 32, "This is a test assert.");
       // Trying to blink the first LED
       if (pinState)
       {
