@@ -294,6 +294,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF10_OTG_HS;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  // @JDM configure SCK/D13 pin (has ld1 attached)
+  GPIO_InitStruct.Pin = ARDUINO_SCK_D13_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(ARDUINO_SCK_D13_GPIO_Port, &GPIO_InitStruct);
+
 }
 
 int main(void)
@@ -308,9 +315,22 @@ int main(void)
 
    printf("Initialization complete, beginning main loop\r\n");
    uint32_t i = 0;
+   bool pinState = false;
+   GPIO_PinState writeVal = GPIO_PIN_SET;
    while (1)
    {
       printf("This is a printf test. i = %ld\r\n", i++);
+      // Trying to blink the first LED
+      if (pinState)
+      {
+         writeVal = GPIO_PIN_RESET;
+      }
+      else
+      {
+         writeVal = GPIO_PIN_SET;
+      }
+      HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, writeVal);
+      pinState = !pinState;
       HAL_Delay(1000);
 
       //usb.process();
