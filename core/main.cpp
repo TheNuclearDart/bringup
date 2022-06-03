@@ -10,32 +10,16 @@
 #include "syscalls.h"
 
 #include "gpio_defines.h"
+#include "lcd.h"
 #include "print.h"
 #include "usb_host.h"
 
 // File local variables
 namespace
 {
-   UART_HandleTypeDef uart1 = 
-   {
-      .Instance = USART1,
-      .Init =
-      {
-         .BaudRate = 115200,
-         .WordLength = UART_WORDLENGTH_8B,
-         .StopBits = UART_STOPBITS_1,
-         .Parity = UART_PARITY_NONE,
-         .Mode = UART_MODE_TX_RX,
-         .HwFlowCtl = UART_HWCONTROL_NONE,
-         .OverSampling = UART_OVERSAMPLING_16,
-         .OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE
-      },
-      .AdvancedInit =
-      {
-         .AdvFeatureInit = UART_ADVFEATURE_NO_INIT
-      }
-   };
-   Print print(uart1, UINT32_MAX); // Need to determine better timeout. Is uart1 what I want?
+   // Need to decouple this more from the HAL
+   Print print(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, UINT32_MAX);
+   LCD lcd;
    //USB_Host usb;
 }
 
@@ -312,6 +296,9 @@ int main(void)
    print.init();
    printf("Print initialized!\r\n");
    //usb.start(); // Start USB host. Was initialized at declaration
+
+   lcd.init();
+   printf("LCD initialized!\r\n");
 
    printf("Initialization complete, beginning main loop\r\n");
    uint32_t i = 0;

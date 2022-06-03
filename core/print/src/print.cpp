@@ -1,5 +1,4 @@
 #include "print.h"
-#include "stm32f7xx.h"
 
 /**
  * @brief Simple wrapper for setting up UART to print. Not sure this is the best way to do this
@@ -9,6 +8,30 @@
 Print::Print(UART_HandleTypeDef &uart, uint32_t timeout)
 {
    this->uartInstance = uart;
+   this->timeout = timeout;
+}
+
+Print::Print(USART_TypeDef *uartInstance, uint32_t baudRate, uint32_t wordLength, uint32_t stopBits, uint32_t parity, uint32_t mode, uint32_t hwFlowCtl, uint32_t overSampling, uint32_t oneBitSampling, uint32_t timeout)
+{
+   this->uartInstance = 
+   {
+      .Instance = uartInstance,
+      .Init =
+      {
+         .BaudRate = baudRate,
+         .WordLength = wordLength,
+         .StopBits = stopBits,
+         .Parity = parity,
+         .Mode = mode,
+         .HwFlowCtl = hwFlowCtl,
+         .OverSampling = overSampling,
+         .OneBitSampling = oneBitSampling
+      },
+      .AdvancedInit =
+      {
+         .AdvFeatureInit = UART_ADVFEATURE_NO_INIT
+      }
+   };
    this->timeout = timeout;
 }
 
