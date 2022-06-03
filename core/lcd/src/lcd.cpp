@@ -47,7 +47,10 @@ void LCD::init(void)
    else
    {
       initialized = true;
-      HAL_LTDC_Init(&this->ltdcInstance); // Need to check error.
+      if (HAL_LTDC_Init(&this->ltdcInstance) != HAL_OK)
+      {
+         assert_msg(0, "Error in HAL_LTDC_Init!\r\n");
+      }
 
       LTDC_LayerCfgTypeDef layerCfg = 
       {
@@ -70,7 +73,10 @@ void LCD::init(void)
             .Red = 0
          }
       };
-      HAL_LTDC_ConfigLayer(&this->ltdcInstance, &layerCfg, 0); // Need to check error
+      if (HAL_LTDC_ConfigLayer(&this->ltdcInstance, &layerCfg, 0) != HAL_OK)
+      {
+         assert_msg(0, "Error in HAL_LTDC_ConfigLayer!\r\n");
+      }
    }
 }
 
