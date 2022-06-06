@@ -42,7 +42,7 @@ void LCD::init(void)
    if (initialized)
    {
       // Assert? Do something
-      printf("This library already initialized.");
+      printf("This library already initialized.\r\n");
    }
    else
    {
