@@ -60,7 +60,7 @@ void Print::out(const uint8_t &data, const uint32_t size)
 }
 
 // Raw wrapper for HAL_UART_Transmit
-void Print::outRaw(const uint8_t *pData, uint16_t Size, uint32_t Timeout)
+void Print::out_raw(const uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
    HAL_UART_Transmit(&this->uartInstance, pData, Size, Timeout);
 }
