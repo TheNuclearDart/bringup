@@ -10,17 +10,13 @@
 #include "syscalls.h"
 
 #include "gpio_defines.h"
-#include "lcd.h"
 #include "print.h"
-#include "usb_host.h"
 
 // File local variables
 namespace
 {
    // Need to decouple this more from the HAL
    Print print(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, UINT32_MAX);
-   LCD lcd;
-   //USB_Host usb;
 }
 
 // These need to live in a separate file, not sure where yet, maybe something with print.cpp
@@ -33,8 +29,15 @@ namespace
 
 PUTCHAR_PROTOTYPE
 {
-   print.out(ch, 1);
-   return ch;
+   if (print_is_initialized())
+   {
+      print.out(ch, 1);
+      return ch;
+   }
+   else
+   {
+      return ch;
+   }
 }
 
 // Taken from cubemx generated code. Should try to understand.
@@ -83,7 +86,7 @@ void SystemClock_Config(void)
 
    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_6) != HAL_OK)
    {
-      assert_param(0);
+      //Error_Handler();
    }
    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SPDIFRX|RCC_PERIPHCLK_LTDC
                                  |RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_USART1
@@ -111,14 +114,8 @@ void SystemClock_Config(void)
    PeriphClkInitStruct.Sdmmc1ClockSelection = RCC_SDMMC1CLKSOURCE_CLK48;
    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
    {
-      assert_param(0);
+      //Error_Handler();
    }
-}
-
-// Implementation of wrapper function for USB Host class. Not sure that this is the best way to do this.
-void USB_Host::userFuncWrapper(USBH_HandleTypeDef *pHostHandle, uint8_t id)
-{
-   //usb.userFunc(pHostHandle, id);
 }
 
 /**
@@ -294,34 +291,24 @@ int main(void)
    MX_GPIO_Init(); // This needs replacing or fixing, wasn't needed for UART like thought
 
    print.init();
-   printf("Print initialized!\r\n");
-   //usb.start(); // Start USB host. Was initialized at declaration
+   printf("Print initialized in bootloader...\r\n");
 
-   lcd.init();
-   printf("LCD initialized!\r\n");
+   printf("Bootloader init complete, looking for main image...\r\n");
 
-   printf("Initialization complete, beginning main loop\r\n");
-   uint32_t i = 0;
-   bool pinState = false;
-   GPIO_PinState writeVal = GPIO_PIN_SET;
+   bool imageValid = false;
+   
+   // Check image headers here, and then load the image.
+   // No code for this yet, or definition of the header
+   if (imageValid)
+   {
+      printf("Valid image found! De-initializing BL HAL and jumping to main image...\r\n");
+      HAL_DeInit();
+      // Jump to image.
+   }
+
+   printf("No valid image found! Spinning...\r\n"); // Eventually, want to like fall into a 
    while (1)
    {
-      printf("This is a printf test. i = %ld\r\n", i++);
-      assert_msg(i <= 32, "This is a test assert.");
-      // Trying to blink the first LED
-      if (pinState)
-      {
-         writeVal = GPIO_PIN_RESET;
-      }
-      else
-      {
-         writeVal = GPIO_PIN_SET;
-      }
-      HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, writeVal);
-      pinState = !pinState;
-      HAL_Delay(1000);
-
-      //usb.process();
    }
 
    return 1;
