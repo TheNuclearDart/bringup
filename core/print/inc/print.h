@@ -17,4 +17,6 @@ class Print
       uint32_t timeout;
 };
 
+bool print_is_initialized(void);
+
 #endif
