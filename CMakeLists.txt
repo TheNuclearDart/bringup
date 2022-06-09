@@ -8,13 +8,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(TARGET blink)
 
 set(CMAKE_EXECUTABLE_SUFFIX ".elf")
-set(LINKER_FILE "${CMAKE_CURRENT_LIST_DIR}/memory_layout.ld")
-message(STATUS "Linker Script: ${LINKER_FILE}")
-set(CMAKE_EXE_LINKER_FLAGS "-lc -lm -lnosys -specs=nano.specs -T${LINKER_FILE} -Wl,-Map=${CMAKE_SOURCE_DIR}/build/memory_map.map,--cref -Wl,--gc-sections")
+set(LINKER_FILE "${CMAKE_CURRENT_LIST_DIR}/core/memory_layout/app_memory_layout.ld")
+message(STATUS "Linker Script for ${TARGET}: ${LINKER_FILE}")
+set(CMAKE_EXE_LINKER_FLAGS "-lc -lm -lnosys -specs=nano.specs -L${CMAKE_SOURCE_DIR}/core/memory_layout/ -T${LINKER_FILE} -Wl,-Map=${CMAKE_SOURCE_DIR}/build/app_memory_map.map,--cref -Wl,--gc-sections")
 
 # Source files
 set(SRC
-   ${CMAKE_CURRENT_LIST_DIR}/startup.s
    ${CMAKE_CURRENT_LIST_DIR}/core/main.cpp
    ${CMAKE_CURRENT_LIST_DIR}/core/syscalls.c
    ${CMAKE_CURRENT_LIST_DIR}/core/stm32f7xx_hal_msp.c
@@ -31,10 +30,11 @@ set(SRC
    ${CMAKE_CURRENT_LIST_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.c
    ${CMAKE_CURRENT_LIST_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.c
 )
+# Build the application executable
 add_executable(${TARGET} ${SRC})
 
 # Includes
-target_include_directories(blink PUBLIC 
+target_include_directories(${TARGET} PUBLIC 
    ${CMAKE_CURRENT_LIST_DIR}/core/
    ${CMAKE_CURRENT_LIST_DIR}/core/board_defines/inc
    ${CMAKE_CURRENT_LIST_DIR}/core/interrupts/inc
@@ -45,6 +45,9 @@ target_include_directories(blink PUBLIC
 )
 
 add_compile_definitions(STM32F746xx USE_HAL_DRIVER USE_FULL_ASSERT)
+
+# add_subdirectory for bootloader?
+add_subdirectory(core/bootloader)
 
 # add_subdirectory _after_ actions, so that subdirs inherit variables and such
 add_subdirectory(core/assert)

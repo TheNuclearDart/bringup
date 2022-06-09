@@ -1,18 +1,6 @@
-/* License needed */
+INCLUDE memory_layout.ld
 
 ENTRY(reset_handler)
-
-_min_stack_size = 0x400;
-_min_heap_size  = 0x200; /*Not sure that this is needed */
-
-MEMORY
-{
-   ITCM (xrw) : ORIGIN = 0x00000000, LENGTH = 64K /*verify this length */
-   DTCM (xrw) : ORIGIN = 0x20000000, LENGTH = 64K
-   SRAM (xrw) : ORIGIN = 0x20010000, LENGTH = 240K
-   FLASH (xr) : ORIGIN = 0x08000000, LENGTH = 1024K
-   /* Needs external RAM (if it exists on the board? 5-11-22 it does, but it needs to be added) */
-}
 
 SECTIONS
 {
@@ -21,7 +9,7 @@ SECTIONS
       . = ALIGN(4);
       KEEP(*(.isr_vector))
       . = ALIGN(4);
-   } > FLASH
+   } > BL_FLASH
 
    .text :
    {
@@ -37,7 +25,7 @@ SECTIONS
 
       . = ALIGN(4);
       _etext = .;
-   } > FLASH
+   } > BL_FLASH
 
    .rodata :
    {
@@ -45,19 +33,19 @@ SECTIONS
       *(.rodata) /* All constant data goes in flash */
       *(.roadata*)
       . = ALIGN(4);
-   } > FLASH
+   } > BL_FLASH
 
    .ARM.extab : 
    { 
       *(.ARM.extab* .gnu.linkonce.armextab.*) 
-   } > FLASH
+   } > BL_FLASH
   
   .ARM : 
   {
       __exidx_start = .;
       *(.ARM.exidx*)
       __exidx_end = .;
-  } > FLASH
+  } > BL_FLASH
 
   /* These are things I need to understand */
   .preinit_array :
@@ -65,7 +53,7 @@ SECTIONS
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
-  } > FLASH
+  } > BL_FLASH
   
   .init_array :
   {
@@ -73,7 +61,7 @@ SECTIONS
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
-  } > FLASH
+  } > BL_FLASH
   
   .fini_array :
   {
@@ -81,7 +69,7 @@ SECTIONS
     KEEP (*(SORT(.fini_array.*)))
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
-  } > FLASH
+  } > BL_FLASH
 
    _sidata = LOADADDR(.data); /* Expose the load address (RAM address) for .data */
    .data :
@@ -92,7 +80,7 @@ SECTIONS
       *(.data*)
       . = ALIGN(4);
       _edata = .;
-   } > SRAM AT > FLASH
+   } > SRAM AT > BL_FLASH
 
    .bss (NOLOAD) :
    {

@@ -37,7 +37,7 @@ reset_handler:
    ldr r4, =_ebss /* r4 holds the address to end on */
    movs r3, #0 /* r3 contains const 0? */
    bl LoopZeroFill
-   ldr r0, =_sdata 
+   ldr r0, =_sdata /* This is where code is copied from flash to SRAM/destination using LoopCopyDataSection */
    ldr r1, =_edata
    ldr r2, =_sidata
    movs r3, #0 /* Incrementing offset */
@@ -45,7 +45,7 @@ reset_handler:
    bl SystemInit /* System init function (if needed, I think this is CMSIS) */
    bl __libc_init_array /* Init libc (dunno how this works yet) */
 
-   bl main /* Jump to application! */
+   bl main /* Jump to bootloader! Something I've done requires this to be main, and not bl_main (even if that is just a simple rename of main() in bootloader.cpp...) */
    b Infinite_Loop
    /* Need to do something here if main returns eventually */
 .size reset_handler, .-reset_handler
