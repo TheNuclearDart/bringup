@@ -40,6 +40,19 @@ PUTCHAR_PROTOTYPE
    }
 }
 
+// Move this to its own file if it works
+extern uint32_t __app_start__;
+extern uint32_t __app_size__;
+
+void relocate_image(void)
+{
+   uint32_t test = __app_start__;
+   uint32_t test2 = __app_size__;
+   printf("__app_start__ %lx\r\n", __app_start__);
+   printf("__app_size__ %lx\r\n", test2);
+}
+
+
 // Taken from cubemx generated code. Should try to understand.
 void SystemClock_Config(void)
 {
@@ -294,6 +307,7 @@ int main(void)
    printf("Print initialized in bootloader...\r\n");
 
    printf("Bootloader init complete, looking for main image...\r\n");
+   relocate_image();
 
    bool imageValid = false;
    

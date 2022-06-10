@@ -14,6 +14,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-lc -lm -lnosys -specs=nano.specs -L${CMAKE_SOURCE_D
 
 # Source files
 set(SRC
+   ${CMAKE_CURRENT_LIST_DIR}/startup.s
    ${CMAKE_CURRENT_LIST_DIR}/core/main.cpp
    ${CMAKE_CURRENT_LIST_DIR}/core/syscalls.c
    ${CMAKE_CURRENT_LIST_DIR}/core/stm32f7xx_hal_msp.c
