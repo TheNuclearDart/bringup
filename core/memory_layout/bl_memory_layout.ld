@@ -80,7 +80,7 @@ SECTIONS
       *(.data*)
       . = ALIGN(4);
       _edata = .;
-   } > SRAM AT > BL_FLASH
+   } > DTCM AT > BL_FLASH
 
    .bss (NOLOAD) :
    {
@@ -91,7 +91,7 @@ SECTIONS
       *(COMMON)
       . = ALIGN(4);
       _ebss = .;
-   } > SRAM
+   } > DTCM
 
    /* The stack must be the last RAM rule (I think) */
    .stack (NOLOAD) :
@@ -102,7 +102,7 @@ SECTIONS
       . = . + _min_stack_size;
       . = ALIGN(8);
       _estack = .;
-   } > SRAM
+   } > DTCM
 
    /* Remove information from the standard libraries */
   /DISCARD/ :
