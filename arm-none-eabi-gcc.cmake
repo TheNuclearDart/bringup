@@ -23,17 +23,18 @@ set(FLOAT_ABI "-mfloat-abi=hard")
 string(JOIN " " MCU ${CPU} "-mthumb" ${FPU} ${FLOAT_ABI})
 message(STATUS "MCU: ${MCU}")
 
-set(OPT "-Og")
-
 string(JOIN " " ASFLAGS " -x assembler-with-cpp" ${MCU} ${OPT} "-Wall -fdata-sections -ffunction-sections")
 string(JOIN " " CFLAGS ${MCU} ${OPT} "-Wall -fdata-sections -ffunction-sections -fno-exceptions")
 string(JOIN " " CXXFLAGS ${CFLAGS} "-fno-rtti")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+   set(OPT "-O0")
    message(STATUS "Debug build")
    string(APPEND CFLAGS " -g -gdwarf-2 -MMD -MP")
    string(APPEND CXXFLAGS " -g -gdwarf-2 -MMD -MP")
    string(APPEND ASFLAGS " -g -gdwarf-2 -MMD -MP")
+else()
+   set(OPT "-O3")
 endif()
 
 string(JOIN " " CMAKE_ASM_FLAGS_DEBUG ${ASFLAGS})
