@@ -50,35 +50,29 @@ extern uint32_t __sram_start__;
 // Break this into multiple functions, pleaseeee
 void relocate_image(void)
 {
-   //uint32_t *test = &__app_start__;
-   //uint32_t *test2 = &__app_size__;
-   //printf("__app_start__ %lx\r\n", reinterpret_cast<uint32_t>(test));
-   //printf("__app_size__ %lx\r\n", reinterpret_cast<uint32_t>(test2));
-
    uint32_t *imageStart = &__app_start__;
    uint32_t *sramStart = &__sram_start__;
    uint32_t appSize = reinterpret_cast<uint32_t>(&__app_size__);
-   //printf("sramStart %lx &sramStart %lx\r\n", sramStart, &sramStart);
 
    // Copy the image from Flash to SRAM
-   // memcpy isn't copying the image??
-   //uint32_t firstWord = *imageStart;
-   //printf("first word of image is %x\r\n", firstWord);
    memcpy(sramStart, imageStart, appSize);
 
    // Now execute.
-   // Set the stack pointer (do we need to do this if our app reset handler does?)
 
-   //printf("Setting MSP to %lx\r\n", reinterpret_cast<uint32_t>(sramStart));
+   // Set stack pointer to start of image. Image _should_ reset it to what it desires in it's own startup
    __set_MSP(reinterpret_cast<uint32_t>(sramStart));
+   
+   // Set vector table register to use Application's vector table
    __disable_irq();
    SCB->VTOR = (reinterpret_cast<uint32_t>(sramStart));
    __enable_irq();
-   // Need to reset vector table.. in startup.s or main.cpp for application?
 
+   // Set function pointer to point to second full word, which is the application reset_handler
    uint32_t *appSramStart = reinterpret_cast<uint32_t *>(sramStart[1]); // This points to the reset_handler for the app, but why?
    void (*application)();
    application = (void (*)())appSramStart;
+   
+   // Start application!
    application();
 }
 
@@ -345,7 +339,6 @@ int main(void)
    if (imageValid)
    {
       printf("Valid image found! De-initializing BL HAL and jumping to main image...\r\n");
-      HAL_DeInit();
       // Jump to image.
       relocate_image();
    }
