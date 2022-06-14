@@ -339,6 +339,7 @@ int main(void)
    if (imageValid)
    {
       printf("Valid image found! De-initializing BL HAL and jumping to main image...\r\n");
+      HAL_DeInit();
       // Jump to image.
       relocate_image();
    }
