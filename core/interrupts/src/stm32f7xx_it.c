@@ -19,6 +19,8 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+#include <stdio.h>
+
 #include "stm32f7xx_it.h"
 #include "stm32f7xx_hal.h"
 /* Private includes ----------------------------------------------------------*/
@@ -86,6 +88,7 @@ void NMI_Handler(void)
   */
 void HardFault_Handler(void)
 {
+   printf("Hardfault!!");
   /* USER CODE BEGIN HardFault_IRQn 0 */
 
   /* USER CODE END HardFault_IRQn 0 */

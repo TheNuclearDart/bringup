@@ -294,7 +294,7 @@ int main(void)
    MX_GPIO_Init(); // This needs replacing or fixing, wasn't needed for UART like thought
 
    print.init();
-   printf("Print initialized!\r\n");
+   printf("Print initialized in main app!\r\n");
    //usb.start(); // Start USB host. Was initialized at declaration
 
    lcd.init();

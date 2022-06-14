@@ -37,11 +37,13 @@ reset_handler:
    ldr r4, =_ebss /* r4 holds the address to end on */
    movs r3, #0 /* r3 contains const 0? */
    bl LoopZeroFill
-   ldr r0, =_sdata /* This is where code is copied from flash to SRAM/destination using LoopCopyDataSection */
-   ldr r1, =_edata
-   ldr r2, =_sidata
-   movs r3, #0 /* Incrementing offset */
-   bl LoopCopyDataSection
+   // The .data section does not need to be copied by the app, the bootloader will relocate the entire image to SRAM/RAM.
+   // BL is running out of Flash and DTCM to prevent any mangling (how would we have the app use DTCM, but prevent BL from mangling itself?)
+   //ldr r0, =_sdata /* This is where code is copied from flash to SRAM/destination using LoopCopyDataSection */
+   //ldr r1, =_edata
+   //ldr r2, =_sidata
+   //movs r3, #0 /* Incrementing offset */
+   //bl LoopCopyDataSection
    bl SystemInit /* System init function (if needed, I think this is CMSIS) */
    bl __libc_init_array /* Init libc (dunno how this works yet) */
 

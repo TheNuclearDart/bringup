@@ -2,6 +2,7 @@
  * Need to add a license or something
  ************************************/
 
+#include <cstring>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -41,15 +42,44 @@ PUTCHAR_PROTOTYPE
 }
 
 // Move this to its own file if it works
+// Remember to use & for real address
 extern uint32_t __app_start__;
 extern uint32_t __app_size__;
+extern uint32_t __sram_start__;
 
+// Break this into multiple functions, pleaseeee
 void relocate_image(void)
 {
-   uint32_t test = __app_start__;
-   uint32_t test2 = __app_size__;
-   printf("__app_start__ %lx\r\n", __app_start__);
-   printf("__app_size__ %lx\r\n", test2);
+   //uint32_t *test = &__app_start__;
+   //uint32_t *test2 = &__app_size__;
+   //printf("__app_start__ %lx\r\n", reinterpret_cast<uint32_t>(test));
+   //printf("__app_size__ %lx\r\n", reinterpret_cast<uint32_t>(test2));
+
+   uint32_t *imageStart = &__app_start__;
+   uint32_t *sramStart = &__sram_start__;
+   uint32_t appSize = reinterpret_cast<uint32_t>(&__app_size__);
+   //printf("sramStart %lx &sramStart %lx\r\n", sramStart, &sramStart);
+
+   // Copy the image from Flash to SRAM
+   // memcpy isn't copying the image??
+   //uint32_t firstWord = *imageStart;
+   //printf("first word of image is %x\r\n", firstWord);
+   memcpy(sramStart, imageStart, appSize);
+
+   // Now execute.
+   // Set the stack pointer (do we need to do this if our app reset handler does?)
+
+   //printf("Setting MSP to %lx\r\n", reinterpret_cast<uint32_t>(sramStart));
+   __set_MSP(reinterpret_cast<uint32_t>(sramStart));
+   __disable_irq();
+   SCB->VTOR = (reinterpret_cast<uint32_t>(sramStart));
+   __enable_irq();
+   // Need to reset vector table.. in startup.s or main.cpp for application?
+
+   uint32_t *appSramStart = reinterpret_cast<uint32_t *>(sramStart[1]); // This points to the reset_handler for the app, but why?
+   void (*application)();
+   application = (void (*)())appSramStart;
+   application();
 }
 
 
@@ -307,9 +337,8 @@ int main(void)
    printf("Print initialized in bootloader...\r\n");
 
    printf("Bootloader init complete, looking for main image...\r\n");
-   relocate_image();
 
-   bool imageValid = false;
+   bool imageValid = true; // True just to test
    
    // Check image headers here, and then load the image.
    // No code for this yet, or definition of the header
@@ -318,6 +347,7 @@ int main(void)
       printf("Valid image found! De-initializing BL HAL and jumping to main image...\r\n");
       HAL_DeInit();
       // Jump to image.
+      relocate_image();
    }
 
    printf("No valid image found! Spinning...\r\n"); // Eventually, want to like fall into a 
