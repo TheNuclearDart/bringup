@@ -80,7 +80,7 @@ SECTIONS
       *(.data*)
       . = ALIGN(4);
       _edata = .;
-   } > SRAM AT > SRAM
+   } > SRAM
 
    .bss (NOLOAD) :
    {
