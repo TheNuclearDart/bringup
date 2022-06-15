@@ -28,17 +28,18 @@ set(SRC
 add_executable(${TARGET} ${SRC})
 
 # Includes
-target_include_directories(${TARGET} PUBLIC 
+target_include_directories(${TARGET} PUBLIC
    ${CMAKE_SOURCE_DIR}/core/
    ${CMAKE_SOURCE_DIR}/core/board_defines/inc
    ${CMAKE_SOURCE_DIR}/core/interrupts/inc
+   ${CMAKE_SOURCE_DIR}/core/memory_layout/inc
    ${CMAKE_SOURCE_DIR}/drivers/CMSIS/Include
    ${CMAKE_SOURCE_DIR}/drivers/CMSIS/Device/ST/STM32F7xx/Include
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Inc
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Legacy
 )
 
-target_link_libraries(${TARGET} assert print)
+target_link_libraries(${TARGET} assert print fw_image)
 # Don't forget to adjust "--pad-to" when changing location of Bootloader binary! If there's a way to set this globally, need to do that instead
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objcopy --pad-to=0x08008000 --gap-fill=0xFF -O binary ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.elf ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bin)
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objdump -S ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.elf > ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.txt)
