@@ -39,6 +39,7 @@ target_include_directories(${TARGET} PUBLIC
    ${CMAKE_CURRENT_LIST_DIR}/core/
    ${CMAKE_CURRENT_LIST_DIR}/core/board_defines/inc
    ${CMAKE_CURRENT_LIST_DIR}/core/interrupts/inc
+   ${CMAKE_CURRENT_LIST_DIR}/core/memory_layout/inc
    ${CMAKE_CURRENT_LIST_DIR}/drivers/CMSIS/Include
    ${CMAKE_CURRENT_LIST_DIR}/drivers/CMSIS/Device/ST/STM32F7xx/Include
    ${CMAKE_CURRENT_LIST_DIR}/drivers/STM32F7xx_HAL_Driver/Inc
@@ -52,9 +53,10 @@ add_subdirectory(core/bootloader)
 
 # add_subdirectory _after_ actions, so that subdirs inherit variables and such
 add_subdirectory(core/assert)
+add_subdirectory(core/fw_image)
+add_subdirectory(core/lcd)
 add_subdirectory(core/print)
 add_subdirectory(core/usb_host)
-add_subdirectory(core/lcd)
 target_link_libraries(${TARGET} assert print usb_host lcd)
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objcopy -O binary ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.elf ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.bin)
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objdump -S ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.elf > ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.txt)

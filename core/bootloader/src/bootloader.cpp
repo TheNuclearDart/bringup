@@ -2,7 +2,6 @@
  * Need to add a license or something
  ************************************/
 
-#include <cstring>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -10,6 +9,7 @@
 #include "stm32f7xx_hal.h"
 #include "syscalls.h"
 
+#include "fw_image.h"
 #include "gpio_defines.h"
 #include "print.h"
 
@@ -40,42 +40,6 @@ PUTCHAR_PROTOTYPE
       return ch;
    }
 }
-
-// Move this to its own file if it works
-// Remember to use & for real address
-extern uint32_t __app_start__;
-extern uint32_t __app_size__;
-extern uint32_t __sram_start__;
-
-// Break this into multiple functions, pleaseeee
-void relocate_image(void)
-{
-   uint32_t *imageStart = &__app_start__;
-   uint32_t *sramStart = &__sram_start__;
-   uint32_t appSize = reinterpret_cast<uint32_t>(&__app_size__);
-
-   // Copy the image from Flash to SRAM
-   memcpy(sramStart, imageStart, appSize);
-
-   // Now execute.
-
-   // Set stack pointer to start of image. Image _should_ reset it to what it desires in it's own startup
-   __set_MSP(reinterpret_cast<uint32_t>(sramStart));
-   
-   // Set vector table register to use Application's vector table
-   __disable_irq();
-   SCB->VTOR = (reinterpret_cast<uint32_t>(sramStart));
-   __enable_irq();
-
-   // Set function pointer to point to second full word, which is the application reset_handler
-   uint32_t *appSramStart = reinterpret_cast<uint32_t *>(sramStart[1]); // This points to the reset_handler for the app, but why?
-   void (*application)();
-   application = (void (*)())appSramStart;
-   
-   // Start application!
-   application();
-}
-
 
 // Taken from cubemx generated code. Should try to understand.
 void SystemClock_Config(void)
@@ -331,19 +295,15 @@ int main(void)
    printf("Print initialized in bootloader...\r\n");
 
    printf("Bootloader init complete, looking for main image...\r\n");
-
-   bool imageValid = true; // True just to test
    
-   // Check image headers here, and then load the image.
-   // No code for this yet, or definition of the header
-   if (imageValid)
+   // Jump to image.
+   image_error_e error = fw_image_load();
+   if (error == image_error_e::SUCCESS)
    {
-      printf("Valid image found! De-initializing BL HAL and jumping to main image...\r\n");
       HAL_DeInit();
-      // Jump to image.
-      relocate_image();
+      fw_image_execute();
    }
-
+   
    printf("No valid image found! Spinning...\r\n"); // Eventually, want to like fall into a 
    while (1)
    {
