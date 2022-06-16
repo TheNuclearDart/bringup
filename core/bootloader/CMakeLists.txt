@@ -5,7 +5,7 @@ set(LINKER_FILE "${CMAKE_SOURCE_DIR}/core/memory_layout/bl_memory_layout.ld")
 message(STATUS "Linker Script for ${TARGET}: ${LINKER_FILE}")
 message("CMake Linker Flags: ${CMAKE_EXE_LINKER_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "-lc -lm -lnosys -specs=nano.specs -L${CMAKE_SOURCE_DIR}/core/memory_layout/ -T${LINKER_FILE} -Wl,-Map=${CMAKE_SOURCE_DIR}/build/bl_memory_map.map,--cref -Wl,--gc-sections")
-add_compile_definitions(STM32F746xx USE_HAL_DRIVER USE_FULL_ASSERT) # needed?
+add_compile_definitions(STM32F746xx USE_HAL_DRIVER USE_FULL_ASSERT BOOTLOADER_BUILD) # needed?
 
 set(SRC
    ${CMAKE_SOURCE_DIR}/core/bootloader/src/bl_startup.s
@@ -39,7 +39,7 @@ target_include_directories(${TARGET} PUBLIC
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Legacy
 )
 
-target_link_libraries(${TARGET} assert print fw_image)
+target_link_libraries(${TARGET} assert print fw_header fw_image)
 # Don't forget to adjust "--pad-to" when changing location of Bootloader binary! If there's a way to set this globally, need to do that instead
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objcopy --pad-to=0x08008000 --gap-fill=0xFF -O binary ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.elf ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bin)
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objdump -S ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.elf > ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.txt)
