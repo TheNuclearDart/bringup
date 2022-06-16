@@ -41,7 +41,7 @@ image_error_e fw_image_load(void)
       return error;
    }
 
-   relocate_image(image_info.image_src_ptr, image_info.image_dest_ptr, image_info.image_size);
+   relocate_image(image_info.image_src_ptr, image_info.image_dest_ptr, image_info.image_size); // Copy everything including header
 
    return image_error_e::SUCCESS;
 }
@@ -75,7 +75,7 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
 
       // Calculate CRC
       printf("CRC32 of new image is %lx\r\n", header->crc32);
-      uint32_t crc = crc32_func_ptr(reinterpret_cast<uint32_t *>(new_ptr + sizeof(fw_image_header_t)), header->image_size); // Update to use header->image_size once it is valid.
+      uint32_t crc = crc32_func_ptr(reinterpret_cast<uint32_t *>(new_ptr + sizeof(fw_image_header_t)), (header->image_size - sizeof(fw_image_header_t))); // Update to use header->image_size once it is valid.
       printf("Calculated CRC32 is %lx\r\n", crc);
 
       if (crc != header->crc32)

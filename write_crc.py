@@ -16,8 +16,6 @@ fw_header_size = ctypes.sizeof(FwHeader)
 
 bin_size = os.path.getsize(bin_path)
 print("Binary size: " + str(hex(bin_size)))
-bin_size = bin_size - fw_header_size
-print("Binary size without header: " + str(hex(bin_size)))
 
 binary = open(bin_path, "rb+") # make this more generic
 

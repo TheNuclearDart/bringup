@@ -13,7 +13,7 @@ typedef struct _fw_image_header_t
    uint8_t  rsvd[112]; // Pad out to fill space
 } fw_image_header_t;
 
-fw_image_header_t fw_header_get_current_header(void);
-uint32_t          fw_header_get_header_size(void);
+fw_image_header_t *fw_header_get_current_header(void);
+uint32_t           fw_header_get_header_size(void);
 
 #endif

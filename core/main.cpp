@@ -297,7 +297,7 @@ int main(void)
 
    print.init();
    printf("Print initialized in main app!\r\n");
-   printf("FW Version: %lx\r\n", fw_header_get_current_header().fw_version);
+   printf("FW Version: %lx\r\nCRC: %lx\r\n", fw_header_get_current_header()->fw_version, fw_header_get_current_header()->crc32);
    //usb.start(); // Start USB host. Was initialized at declaration
 
    lcd.init();
