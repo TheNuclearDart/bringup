@@ -9,6 +9,7 @@
 #include "stm32f7xx_hal.h"
 #include "syscalls.h"
 
+#include "fw_header.h"
 #include "gpio_defines.h"
 #include "lcd.h"
 #include "print.h"
@@ -295,6 +296,7 @@ int main(void)
 
    print.init();
    printf("Print initialized in main app!\r\n");
+   printf("FW Version: %lx\r\n", fw_header_get_current_header().fw_version);
    //usb.start(); // Start USB host. Was initialized at declaration
 
    lcd.init();

@@ -81,6 +81,9 @@ void NMI_Handler(void)
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
 
   /* USER CODE END NonMaskableInt_IRQn 1 */
+  while (1)
+  {
+  }
 }
 
 /**
@@ -155,6 +158,8 @@ void DebugMon_Handler(void)
   /* USER CODE BEGIN DebugMonitor_IRQn 1 */
 
   /* USER CODE END DebugMonitor_IRQn 1 */
+  while(1)
+  {}
 }
 
 /******************************************************************************/
@@ -229,6 +234,18 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 }
 
 /* USER CODE BEGIN 1 */
+// Not sure if these are peripheral or ARM exception. Defining them so we don't fall into default handler(infinite loop)
+void PendSV_Handler(void)
+{
+   while(1)
+   {}
+}
+
+void SysTick_Handler(void)
+{
+   while(1)
+   {}
+}
 
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

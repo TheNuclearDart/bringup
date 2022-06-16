@@ -4,11 +4,18 @@ ENTRY(reset_handler)
 
 SECTIONS
 {
-   .isr_vector :
+   .fw_header :
    {
       . = ALIGN(4);
-      KEEP(*(.isr_vector))
+      KEEP(*(.fw_header))
       . = ALIGN(4);
+   } > SRAM
+
+   .isr_vector :
+   {
+      . = ALIGN(128);
+      KEEP(*(.isr_vector))
+      . = ALIGN(128);
    } > SRAM
 
    .text :
