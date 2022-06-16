@@ -1,4 +1,5 @@
 #include <cstring>
+#include <stdio.h>
 
 #include "stm32f746xx.h"
 
@@ -13,13 +14,21 @@ typedef struct _image_info_t
    uint32_t image_size;
 } image_info_t;
 
-
 // local functions
 static void          relocate_image(uint32_t *image_ptr, uint32_t *dest_ptr, uint32_t image_size);
 static image_error_e find_validate_image(uint32_t *image_addr);
 
-// local data
-image_info_t image_info = {0};
+namespace 
+{
+   // local data
+   image_info_t image_info = {0};
+   uint32_t (*crc32_func_ptr)(uint32_t *buffer, uint32_t length); // Function pointer for calculating CRC
+}
+
+void fw_image_init(uint32_t (*func_ptr)(uint32_t *buffer, uint32_t length))
+{
+   crc32_func_ptr = func_ptr;  
+}
 
 // Validate, relocate/load, and execute
 image_error_e fw_image_load(void)
@@ -60,19 +69,24 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
    // Check the header for image A
    fw_image_header_t *header = reinterpret_cast<fw_image_header_t *>(image_ptr);
 
-#if 1
    if (header->active)
    {
-      //uint32_t header_size = fw_header_get_header_size();
       uint8_t *new_ptr = reinterpret_cast<uint8_t *>(image_ptr);
-      //new_ptr += header_size;
 
       // Calculate CRC
+      printf("CRC32 of new image is %lx\r\n", header->crc32);
+      uint32_t crc = crc32_func_ptr(reinterpret_cast<uint32_t *>(new_ptr + sizeof(fw_image_header_t)), header->image_size); // Update to use header->image_size once it is valid.
+      printf("Calculated CRC32 is %lx\r\n", crc);
+
+      if (crc != header->crc32)
+      {
+         printf("CRC doesn't match!\r\n");
+         return image_error_e::INVALID_IMAGE; // Need to try to boot other image then instead of failing out?
+      }
 
       // Assign values to global struct
       image_info.image_src_ptr = reinterpret_cast<uint32_t *>(new_ptr);
-      //image_info.image_size = header->image_size;
-      image_info.image_size = reinterpret_cast<uint32_t>(&__app_size__); // Temporary until I can get tool filling in header
+      image_info.image_size = header->image_size;
       
       uint32_t *sram_start_ptr = &__sram_start__; // Need to think about this, maybe the image header or something should have the start addr?
       image_info.image_dest_ptr = sram_start_ptr;
@@ -88,11 +102,7 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
          image_info.image_size = header->image_size;
       }
    }
-#else
-   // For now, just set everything to start of region and size of region
-   image_info.image_ptr = image_ptr;
-   image_info.image_size = reinterpret_cast<uint32_t>(&__app_size__);
-#endif
+
    return image_error_e::SUCCESS;
 }
 

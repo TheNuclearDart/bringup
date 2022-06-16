@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+// If this structure is updated, be sure to update header in write_crc.py
 typedef struct _fw_image_header_t
 {
    bool active;
@@ -13,6 +14,6 @@ typedef struct _fw_image_header_t
 } fw_image_header_t;
 
 fw_image_header_t fw_header_get_current_header(void);
-uint32_t fw_header_get_header_size(void);
+uint32_t          fw_header_get_header_size(void);
 
 #endif

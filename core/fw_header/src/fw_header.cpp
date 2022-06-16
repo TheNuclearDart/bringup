@@ -1,13 +1,7 @@
 #include "fw_header.h"
 
 #if !BOOTLOADER_BUILD
-__attribute__((section(".fw_header"))) constexpr fw_image_header_t fw_image_header = 
-{
-   .active     = true,
-   .fw_version = 0xFFFFFFFF,
-   .image_size = 0xFFFFFFFF,
-   .crc32      = 0xFFFFFFFF,
-};
+__attribute__((section(".fw_header"))) fw_image_header_t fw_image_header; // To be filled out elsewhere?
 #endif
 
 fw_image_header_t fw_header_get_current_header(void)

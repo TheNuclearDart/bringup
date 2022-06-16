@@ -37,6 +37,7 @@ add_executable(${TARGET} ${SRC})
 # Includes
 target_include_directories(${TARGET} PUBLIC 
    ${CMAKE_CURRENT_LIST_DIR}/core/
+   ${CMAKE_CURRENT_LIST_DIR}/core/crc32/inc
    ${CMAKE_CURRENT_LIST_DIR}/core/board_defines/inc
    ${CMAKE_CURRENT_LIST_DIR}/core/fw_header/inc
    ${CMAKE_CURRENT_LIST_DIR}/core/interrupts/inc
@@ -54,12 +55,13 @@ add_subdirectory(core/bootloader)
 
 # add_subdirectory _after_ actions, so that subdirs inherit variables and such
 add_subdirectory(core/assert)
+add_subdirectory(core/crc32)
 add_subdirectory(core/fw_header)
 add_subdirectory(core/fw_image)
 add_subdirectory(core/lcd)
 add_subdirectory(core/print)
 add_subdirectory(core/usb_host)
-target_link_libraries(${TARGET} fw_header assert print usb_host lcd)
+target_link_libraries(${TARGET} assert crc32 fw_header lcd print usb_host)
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objcopy -O binary ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.elf ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.bin)
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objdump -S ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.elf > ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.txt)
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-size ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.elf)

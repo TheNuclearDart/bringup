@@ -39,7 +39,7 @@ target_include_directories(${TARGET} PUBLIC
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Legacy
 )
 
-target_link_libraries(${TARGET} assert print fw_header fw_image)
+target_link_libraries(${TARGET} assert crc32 fw_header fw_image print)
 # Don't forget to adjust "--pad-to" when changing location of Bootloader binary! If there's a way to set this globally, need to do that instead
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objcopy --pad-to=0x08008000 --gap-fill=0xFF -O binary ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.elf ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.bin)
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objdump -S ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.elf > ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.txt)

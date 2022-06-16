@@ -9,6 +9,7 @@
 #include "stm32f7xx_hal.h"
 #include "syscalls.h"
 
+#include "crc32.h"
 #include "fw_image.h"
 #include "gpio_defines.h"
 #include "print.h"
@@ -290,6 +291,9 @@ int main(void)
    HAL_Init(); // Init ST Provided HAL
    SystemClock_Config(); // Initialize system clocks
    MX_GPIO_Init(); // This needs replacing or fixing, wasn't needed for UART like thought
+
+   crc32_init();
+   fw_image_init(&crc32_calculate);
 
    print.init();
    printf("Print initialized in bootloader...\r\n");
