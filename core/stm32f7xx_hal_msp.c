@@ -197,3 +197,12 @@ void HAL_LTDC_MspInit(LTDC_HandleTypeDef* hltdc)
   }
 
 }
+
+void HAL_CRC_MspInit(CRC_HandleTypeDef* hcrc)
+{
+   if(hcrc->Instance==CRC)
+   {
+      /* Peripheral clock enable */
+      __HAL_RCC_CRC_CLK_ENABLE();
+   }
+}
