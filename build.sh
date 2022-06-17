@@ -8,8 +8,9 @@ else
    cd build
    cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../arm-none-eabi-gcc.cmake ../ -Wno-dev
    make -j 8
+   hash=$(git rev-parse --short HEAD)
    # Concatenate the .bins into one larger binary.
-   python ../write_header.py
+   python ../write_header.py --hash 0x$hash
    cat ./core/bootloader/bootloader.bin ./blink.bin > full_image.bin
    echo "Full image built at ./build/full_image.bin"
 fi
