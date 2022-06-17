@@ -1,8 +1,8 @@
-set(TARGET crc32)
+set(TARGET crc)
 message(STATUS "Building ${TARGET} library")
 
 set(SRC
-   ${CMAKE_CURRENT_LIST_DIR}/src/crc32.cpp
+   ${CMAKE_CURRENT_LIST_DIR}/src/crc.cpp
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_crc.c
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_crc_ex.c
 )

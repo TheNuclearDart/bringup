@@ -9,7 +9,7 @@
 #include "stm32f7xx_hal.h"
 #include "syscalls.h"
 
-#include "crc32.h"
+#include "crc.h"
 #include "fw_image.h"
 #include "gpio_defines.h"
 #include "uart.h"
@@ -292,8 +292,8 @@ int main(void)
    SystemClock_Config(); // Initialize system clocks
    MX_GPIO_Init(); // This needs replacing or fixing, wasn't needed for UART like thought
 
-   crc32_init();
-   fw_image_init(&crc32_calculate);
+   crc_init();
+   fw_image_init(&crc_calculate);
 
    uart.init();
    printf("Print initialized in bootloader...\r\n");

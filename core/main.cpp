@@ -9,7 +9,7 @@
 #include "stm32f7xx_hal.h"
 #include "syscalls.h"
 
-#include "crc32.h"
+#include "crc.h"
 #include "fw_header.h"
 #include "gpio_defines.h"
 #include "lcd.h"
@@ -306,7 +306,7 @@ int main(void)
    //usb.start(); // Start USB host. Was initialized at declaration
 
    lcd.init();
-   crc32_init();
+   crc_init();
    printf("LCD initialized!\r\n");
 
    printf("Initialization complete, beginning main loop\r\n");

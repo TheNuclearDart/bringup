@@ -1,12 +1,12 @@
-#include "crc32.h"
+#include "crc.h"
 
 namespace
 {
    bool initialized = false;
-   CRC32 crc32;
+   CRC_Handler crc;
 }
 
-CRC32::CRC32()
+CRC_Handler::CRC_Handler()
 {
    this->crc_instance = 
    {
@@ -15,6 +15,7 @@ CRC32::CRC32()
       {
          .DefaultPolynomialUse    = DEFAULT_POLYNOMIAL_ENABLE,
          .DefaultInitValueUse     = DEFAULT_INIT_VALUE_ENABLE,
+         .CRCLength               = CRC_POLYLENGTH_32B,
          .InputDataInversionMode  = CRC_INPUTDATA_INVERSION_BYTE,
          .OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_ENABLE,
       },
@@ -22,7 +23,7 @@ CRC32::CRC32()
    };
 }
 
-void CRC32::init(void)
+void CRC_Handler::init(void)
 {
    if (initialized)
    {
@@ -32,7 +33,7 @@ void CRC32::init(void)
    HAL_CRC_Init(&this->crc_instance);
 }
 
-uint32_t CRC32::calculate(uint32_t *buffer, uint32_t length)
+uint32_t CRC_Handler::calculate(uint32_t *buffer, uint32_t length)
 {
    uint32_t crc = HAL_CRC_Calculate(&this->crc_instance, buffer, length);
 
@@ -41,12 +42,12 @@ uint32_t CRC32::calculate(uint32_t *buffer, uint32_t length)
    return crc;
 }
 
-uint32_t crc32_calculate(uint32_t *buffer, uint32_t length)
+uint32_t crc_calculate(uint32_t *buffer, uint32_t length)
 {
-   return crc32.calculate(buffer, length);
+   return crc.calculate(buffer, length);
 }
 
-void crc32_init(void)
+void crc_init(void)
 {
-   crc32.init();
+   crc.init();
 }
