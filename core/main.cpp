@@ -287,6 +287,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(ARDUINO_SCK_D13_GPIO_Port, &GPIO_InitStruct);
 
+  // Setup user Push Button, to be used as a trigger for fw update
+  GPIO_InitStruct.Pin = USER_PUSH_BUTTON_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(USER_PUSH_BUTTON_PORT, &GPIO_InitStruct);
 }
 
 int main(void)
@@ -305,26 +310,30 @@ int main(void)
    printf("LCD initialized!\r\n");
 
    printf("Initialization complete, beginning main loop\r\n");
-   uint32_t i = 0;
-   bool pinState = false;
-   GPIO_PinState writeVal = GPIO_PIN_SET;
+   //uint32_t i = 0;
+   //bool pinState = false;
+   //GPIO_PinState writeVal = GPIO_PIN_SET;
    while (1)
    {
-      printf("This is a printf test. i = %ld\r\n", i++);
-      assert_msg(i <= 32, "This is a test assert.");
+      //printf("This is a printf test. i = %ld\r\n", i++);
       // Trying to blink the first LED
-      if (pinState)
+      //if (pinState)
+      //{
+      //   writeVal = GPIO_PIN_RESET;
+      //}
+      //else
+      //{
+      //   writeVal = GPIO_PIN_SET;
+      //}
+      //HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, writeVal);
+      //pinState = !pinState;
+      //HAL_Delay(1000);
+      GPIO_PinState read_val = HAL_GPIO_ReadPin(USER_PUSH_BUTTON_PORT, USER_PUSH_BUTTON_PIN);
+      if (read_val == GPIO_PIN_SET)
       {
-         writeVal = GPIO_PIN_RESET;
+         //printf("Pin pushed!\r\n");
+         //fw_update_ymodem_receive(); // This shouldn't be owned by the fw_update library
       }
-      else
-      {
-         writeVal = GPIO_PIN_SET;
-      }
-      HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, writeVal);
-      pinState = !pinState;
-      HAL_Delay(1000);
-
       //usb.process();
    }
 
