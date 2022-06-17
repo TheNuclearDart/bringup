@@ -13,14 +13,14 @@
 #include "fw_header.h"
 #include "gpio_defines.h"
 #include "lcd.h"
-#include "print.h"
+#include "uart.h"
 #include "usb_host.h"
 
 // File local variables
 namespace
 {
    // Need to decouple this more from the HAL
-   Print print(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, UINT32_MAX);
+   UART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, UINT32_MAX);
    LCD lcd;
    //USB_Host usb;
 }
@@ -35,7 +35,7 @@ namespace
 
 PUTCHAR_PROTOTYPE
 {
-   print.out(ch, 1);
+   uart.out(ch, 1);
    return ch;
 }
 
@@ -300,7 +300,7 @@ int main(void)
    SystemClock_Config(); // Initialize system clocks
    MX_GPIO_Init(); // This needs replacing or fixing, wasn't needed for UART like thought
 
-   print.init();
+   uart.init();
    printf("Print initialized in main app!\r\n");
    printf("FW Version: %lx\r\nCRC: %lx\r\n", fw_header_get_current_header()->fw_version, fw_header_get_current_header()->crc32);
    //usb.start(); // Start USB host. Was initialized at declaration

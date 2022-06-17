@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "print.h"
+#include "uart.h"
 
 bool initialized = false;
 
@@ -9,13 +9,13 @@ bool initialized = false;
  * 
  */
 
-Print::Print(UART_HandleTypeDef &uart, uint32_t timeout)
+UART::UART(UART_HandleTypeDef &uart, uint32_t timeout)
 {
    this->uartInstance = uart;
    this->timeout = timeout;
 }
 
-Print::Print(USART_TypeDef *uartInstance, uint32_t baudRate, uint32_t wordLength, uint32_t stopBits, uint32_t parity, uint32_t mode, uint32_t hwFlowCtl, uint32_t overSampling, uint32_t oneBitSampling, uint32_t timeout)
+UART::UART(USART_TypeDef *uartInstance, uint32_t baudRate, uint32_t wordLength, uint32_t stopBits, uint32_t parity, uint32_t mode, uint32_t hwFlowCtl, uint32_t overSampling, uint32_t oneBitSampling, uint32_t timeout)
 {
    if (initialized)
    {
@@ -49,23 +49,23 @@ Print::Print(USART_TypeDef *uartInstance, uint32_t baudRate, uint32_t wordLength
    }
 }
 
-void Print::init(void)
+void UART::init(void)
 {
    HAL_UART_Init(&this->uartInstance);
 }
 
-void Print::out(const uint8_t &data, const uint32_t size)
+void UART::out(const uint8_t &data, const uint32_t size)
 {
    HAL_UART_Transmit(&this->uartInstance, &data, size, this->timeout);
 }
 
 // Raw wrapper for HAL_UART_Transmit
-void Print::out_raw(const uint8_t *pData, uint16_t Size, uint32_t Timeout)
+void UART::out_raw(const uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
    HAL_UART_Transmit(&this->uartInstance, pData, Size, Timeout);
 }
 
-bool print_is_initialized(void)
+bool UART_is_initialized(void)
 {
    return initialized;
 }

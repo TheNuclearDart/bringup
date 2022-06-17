@@ -12,13 +12,13 @@
 #include "crc32.h"
 #include "fw_image.h"
 #include "gpio_defines.h"
-#include "print.h"
+#include "uart.h"
 
 // File local variables
 namespace
 {
    // Need to decouple this more from the HAL
-   Print print(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, UINT32_MAX);
+   UART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, UINT32_MAX);
 }
 
 // These need to live in a separate file, not sure where yet, maybe something with print.cpp
@@ -31,9 +31,9 @@ namespace
 
 PUTCHAR_PROTOTYPE
 {
-   if (print_is_initialized())
+   if (UART_is_initialized())
    {
-      print.out(ch, 1);
+      uart.out(ch, 1);
       return ch;
    }
    else
@@ -295,7 +295,7 @@ int main(void)
    crc32_init();
    fw_image_init(&crc32_calculate);
 
-   print.init();
+   uart.init();
    printf("Print initialized in bootloader...\r\n");
 
    printf("Bootloader init complete, looking for main image...\r\n");

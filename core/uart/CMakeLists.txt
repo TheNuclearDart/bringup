@@ -1,7 +1,7 @@
-set(TARGET print)
+set(TARGET uart)
 message(STATUS "Building ${TARGET} library")
 set(SRC
-   ${CMAKE_CURRENT_LIST_DIR}/src/print.cpp
+   ${CMAKE_CURRENT_LIST_DIR}/src/uart.cpp
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.c
 )
 add_library(${TARGET} ${SRC})
