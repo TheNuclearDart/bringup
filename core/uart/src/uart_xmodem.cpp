@@ -113,9 +113,9 @@ uint16_t UART::xmodem_receive_bytes(uint8_t *buffer, const uint32_t size)
          {
             crc = crc << 1;
          }
-         crc = crc & 0xFFFF;
-         *buffer++ = byte;
       }
+      crc = crc & 0xFFFF;
+      *buffer++ = byte;
    }
    
    return crc;
