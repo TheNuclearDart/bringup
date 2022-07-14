@@ -20,8 +20,9 @@
 namespace
 {
    // Need to decouple this more from the HAL
-   UART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, UINT32_MAX);
+   UART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, 1000);
    LCD lcd;
+   uint8_t fw_image_buffer[32768]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
    //USB_Host usb;
 }
 
@@ -331,11 +332,17 @@ int main(void)
       GPIO_PinState read_val = HAL_GPIO_ReadPin(USER_PUSH_BUTTON_PORT, USER_PUSH_BUTTON_PIN);
       if (read_val == GPIO_PIN_SET)
       {
-         //printf("Pin pushed!\r\n");
+         printf("FW Update Process Triggered.\r\n");
+         // This is broken and i don't know why, main image doesn't boot with these uncommented.
+         UART::error error = uart.xmodem_receive(fw_image_buffer, 32768);
+         if (error == UART::error::TIMEOUT)
+         {
+            printf("XModem timed out!\r\n");
+         }
          //fw_update_ymodem_receive(); // This shouldn't be owned by the fw_update library
       }
       //usb.process();
    }
 
    return 1;
-}
+}           

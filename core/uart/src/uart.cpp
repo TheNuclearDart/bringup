@@ -65,6 +65,16 @@ void UART::out_raw(const uint8_t *pData, uint16_t Size, uint32_t Timeout)
    HAL_UART_Transmit(&this->uartInstance, pData, Size, Timeout);
 }
 
+UART::error UART::receive_char(uint8_t &char_buff)
+{
+   if(HAL_UART_Receive(&this->uartInstance, &char_buff, 1, this->timeout) == HAL_TIMEOUT)
+   {
+      return error::TIMEOUT;
+   }
+
+   return error::OKAY;
+}
+
 bool UART_is_initialized(void)
 {
    return initialized;
