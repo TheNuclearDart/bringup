@@ -34,22 +34,21 @@ UART::error UART::xmodem_receive(uint8_t *buffer, const uint32_t size)
          break;
       } // Replace with something in the UART class
 
-      //if (this->receive_char(received_char) != error::TIMEOUT)
-      //{
-      //   break;
-      //}
+      if (this->receive_char(received_char) != error::TIMEOUT)
+      {
+         break;
+      }
       if (timeout == 120)
       {
          return error::TIMEOUT;
       }
-      HAL_Delay(1000);
       timeout++;
    }
 
    bool done = false;
    uint32_t num_bytes = 0;
    error error = error::OKAY;
-   uint8_t sequence_number = 0;
+   uint8_t sequence_number = 1;
    while (!done)
    {
       this->receive_char(received_char);
