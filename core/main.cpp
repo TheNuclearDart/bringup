@@ -11,7 +11,10 @@
 
 #include "crc.h"
 #include "fw_header.h"
+#include "fw_image.h"
+#include "fw_update.h"
 #include "gpio_defines.h"
+#include "memory_layout.h" // Temporary
 #include "lcd.h"
 #include "uart.h"
 #include "usb_host.h"
@@ -22,7 +25,7 @@ namespace
    // Need to decouple this more from the HAL
    UART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, 1000);
    LCD lcd;
-   uint8_t fw_image_buffer[32768]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
+   uint8_t fw_image_buffer[0x10000]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
    //USB_Host usb;
 }
 
@@ -304,13 +307,23 @@ int main(void)
    uart.init();
    printf("Print initialized in main app!\r\n");
    printf("FW Version: %lx\r\nCRC: %lx\r\n", fw_header_get_current_header()->fw_version, fw_header_get_current_header()->crc32);
+   // Check the image header and print which image we're running out of
+   fw_image_header_t *header_a = reinterpret_cast<fw_image_header_t *>(fw_image_A_ptr);
+   fw_image_header_t *header_b = reinterpret_cast<fw_image_header_t *>(fw_image_B_ptr);
+   printf("FLASH Header Active: \r\nA: %lX\r\nB: %lX\r\n", (uint32_t)header_a->active, (uint32_t)header_b->active);
    //usb.start(); // Start USB host. Was initialized at declaration
 
    lcd.init();
    crc_init();
+   fw_image_init(&crc32_calculate); // I feel like I need a different solution for this.
    printf("LCD initialized!\r\n");
 
    printf("Initialization complete, beginning main loop\r\n");
+   printf("fw_image_A_ptr = %lX\r\n", (uint32_t)fw_image_A_ptr);
+   printf("fw_image_B_ptr = %lX\r\n", (uint32_t)fw_image_B_ptr);
+   printf("image size = %lX\r\n", fw_image_size);
+
+   //printf("This is the new image!\r\n");
    //uint32_t i = 0;
    //bool pinState = false;
    //GPIO_PinState writeVal = GPIO_PIN_SET;
@@ -329,17 +342,32 @@ int main(void)
       //HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, writeVal);
       //pinState = !pinState;
       //HAL_Delay(1000);
+      // All of this should be in its own thread once we have the OS??
       GPIO_PinState read_val = HAL_GPIO_ReadPin(USER_PUSH_BUTTON_PORT, USER_PUSH_BUTTON_PIN);
       if (read_val == GPIO_PIN_SET)
       {
          printf("FW Update Process Triggered.\r\n");
          // This is broken and i don't know why, main image doesn't boot with these uncommented.
-         UART::error error = uart.xmodem_receive(fw_image_buffer, 32768);
+         UART::error error = uart.xmodem_receive(fw_image_buffer, 0x10000);
+         HAL_Delay(1000); // Temporary
          if (error == UART::error::TIMEOUT)
          {
             printf("XModem timed out!\r\n");
          }
-         //fw_update_ymodem_receive(); // This shouldn't be owned by the fw_update library
+         else if (error == UART::error::OKAY)
+         {
+            printf("Image downloaded successfully!\r\n");
+         }
+         fw_update_error_e update_error = fw_update(fw_image_buffer);
+         if (update_error != fw_update_error_e::SUCCESS)
+         {
+            printf("FW Update failed!\r\n");
+         }
+         else
+         {
+            printf("FW Update succeeded! Resetting Device...\r\n");
+            NVIC_SystemReset();
+         }
       }
       //usb.process();
    }

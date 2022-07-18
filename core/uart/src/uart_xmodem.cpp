@@ -142,7 +142,7 @@ UART::error UART::xmodem_receive_packet(uint8_t *buffer, const uint8_t sequence_
    crc = temp[0] << 8;
    crc += temp[1];
 
-   if ((crc != xcrc) || (packet_sequence_number[0] != sequence_num) || (packet_sequence_number[1] != (uint8_t) ((~(uint32_t)sequence_num) & 0xff)))
+   if ((crc != xcrc) || (packet_sequence_number[0] != sequence_num) || (packet_sequence_number[1] != (255 - sequence_num)))
    {
       this->out(CAN, 1);
       return error::GEN_ERROR;

@@ -75,7 +75,7 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
 
       // Calculate CRC
       printf("CRC32 of new image is %lx\r\n", header->crc32);
-      uint32_t crc = crc32_func_ptr(reinterpret_cast<uint32_t *>(new_ptr + sizeof(fw_image_header_t)), (header->image_size - sizeof(fw_image_header_t))); // Update to use header->image_size once it is valid.
+      uint32_t crc = crc32_func_ptr(reinterpret_cast<uint32_t *>(new_ptr + sizeof(fw_image_header_t)), (header->image_size - sizeof(fw_image_header_t)));
       printf("Calculated CRC32 is %lx\r\n", crc);
 
       if (crc != header->crc32)
@@ -88,20 +88,20 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
       image_info.image_src_ptr = reinterpret_cast<uint32_t *>(new_ptr);
       image_info.image_size = header->image_size;
       
-      uint32_t *sram_start_ptr = &__sram_start__; // Need to think about this, maybe the image header or something should have the start addr?
-      image_info.image_dest_ptr = sram_start_ptr;
-
-      return image_error_e::SUCCESS;
    }
    else
    {
-      header = (header + fw_image_size);
+      header = reinterpret_cast<fw_image_header_t *>(fw_image_B_ptr);
       if (header->active)
       {
-         image_info.image_src_ptr = const_cast<uint32_t *>(fw_image_B_ptr + fw_header_get_header_size());
+         image_info.image_src_ptr = reinterpret_cast<uint32_t *>(header);
          image_info.image_size = header->image_size;
       }
    }
+
+   // Need to put this in the header
+   uint32_t *sram_start_ptr = &__sram_start__; // Need to think about this, maybe the image header or something should have the start addr?
+   image_info.image_dest_ptr = sram_start_ptr;
 
    return image_error_e::SUCCESS;
 }
@@ -133,4 +133,32 @@ void fw_image_execute(void)
    
    // Start application!
    application();
+}
+
+/**
+ * @brief Validate an image in a given buffer by checking its CRC
+ * 
+ * @param image_buffer_ptr Pointer to buffer containing image
+ * @return image_error_e Result of validation.
+ */
+image_error_e fw_image_validate(uint8_t *image_buffer_ptr)
+{
+   fw_image_header_t *header = reinterpret_cast<fw_image_header_t *>(image_buffer_ptr);
+
+   printf("CRC of incoming image in header is: %lx\r\n", header->crc32);
+   uint32_t *actual_image_ptr = reinterpret_cast<uint32_t *>(image_buffer_ptr + sizeof(fw_image_header_t));
+   uint32_t actual_image_size = header->image_size - sizeof(fw_image_header_t);
+   uint32_t crc = crc32_func_ptr(actual_image_ptr, actual_image_size);
+   printf("CRC of incoming image calculated as: %lx\r\n", crc);
+
+   if (crc != header->crc32)
+   {
+      printf("CRC check failed!\r\n");
+      return image_error_e::INVALID_IMAGE;
+   }
+   else
+   {
+      printf("CRC check passed!\r\n");
+      return image_error_e::SUCCESS;
+   }
 }

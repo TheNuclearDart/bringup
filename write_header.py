@@ -40,7 +40,7 @@ print("CRC32 calculated as " + str(hex(crc32)))
 fw_header = FwHeader()
 
 binary.readinto(fw_header)
-fw_header.active = True # Don't do this here eventually
+fw_header.active = True # Default to true, fw update process will clear the active flag of an old image in flash.
 fw_header.fw_version = args.hash
 fw_header.image_size = bin_size
 fw_header.crc32 = crc32
