@@ -5,9 +5,10 @@
 
 enum class image_error_e
 {
-   SUCCESS,
    GENERIC_FAILURE,
    INVALID_IMAGE,
+   NO_VALID_IMAGES,
+   SUCCESS
 };
 
 void          fw_image_init(uint32_t (*func_ptr)(uint32_t *buffer, uint32_t length));
