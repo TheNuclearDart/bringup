@@ -322,7 +322,6 @@ int main(void)
    printf("fw_image_A_ptr = %lX\r\n", (uint32_t)fw_image_A_ptr);
    printf("fw_image_B_ptr = %lX\r\n", (uint32_t)fw_image_B_ptr);
    printf("image size = %lX\r\n", fw_image_size);
-   printf("This is a new image!! Again!!\r\n");
 
    while (1)
    {

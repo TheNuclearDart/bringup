@@ -67,31 +67,77 @@ static void relocate_image(uint32_t *image_ptr, uint32_t *dest_ptr, uint32_t siz
 static image_error_e find_validate_image(uint32_t *image_ptr)
 {
    // Check the header for image A
-   fw_image_header_t *header = reinterpret_cast<fw_image_header_t *>(image_ptr);
+   fw_image_header_t *header_a = reinterpret_cast<fw_image_header_t *>(image_ptr);
+   fw_image_header_t *header_b = reinterpret_cast<fw_image_header_t *>(fw_image_B_ptr);
+   
+   bool fallback = false;
 
-   if (header->active)
+   if (header_a->active)
    {
       // Calculate CRC
       image_error_e error = fw_image_validate(reinterpret_cast<uint8_t *>(image_ptr));
 
       if (error != image_error_e::SUCCESS)
       {
-         return error;
+         printf("Image A validation failed! Falling back on B...\r\n");
+         fallback = true; // The image was bad, so we need to fallback on the other image, even though this one was active
+      }
+
+      if (!fallback)
+      {
+         printf("Image A is valid!\r\n");
+         // Assign values to global struct
+         image_info.image_src_ptr = reinterpret_cast<uint32_t *>(image_ptr);
+         image_info.image_size = header_a->image_size;
+      }
+   }
+   // Now check image B's header if the image is active, or we're falling back on it.
+   else if (header_b->active || fallback == true)
+   {
+      image_error_e error = fw_image_validate(reinterpret_cast<uint8_t *>(header_b));
+
+      if (error != image_error_e::SUCCESS)
+      {
+         printf("Image B validation failed!\r\n");
+         switch(header_b->active)
+         {
+            case false:
+               if (fallback)
+               {
+                  // Since we're already falling back on this image, A must also be bad, so completely fail out.
+                  // In the future, if we get there, we could fall into a recovery image.
+                  return image_error_e::NO_VALID_IMAGES;
+               }
+               break;
+            case true:
+               printf("Falling back to image A...\r\n");
+               // Since this image is invalid, we want to fallback to A
+               fallback = true;
+               break;
+         }
+      }
+      
+      if (!fallback)
+      {
+         printf("Image B is valid!\r\n");
+         image_info.image_src_ptr = reinterpret_cast<uint32_t *>(header_b);
+         image_info.image_size = header_b->image_size;
+      }
+   }
+   // B was active but failed, so fallback on A
+   else if (fallback)
+   {
+      image_error_e error = fw_image_validate(reinterpret_cast<uint8_t *>(image_ptr));
+
+      if (error != image_error_e::SUCCESS)
+      {
+         printf("Image A is invalid!\r\n");
+         return image_error_e::NO_VALID_IMAGES;
       }
 
       // Assign values to global struct
       image_info.image_src_ptr = reinterpret_cast<uint32_t *>(image_ptr);
-      image_info.image_size = header->image_size;
-      
-   }
-   else
-   {
-      header = reinterpret_cast<fw_image_header_t *>(fw_image_B_ptr);
-      if (header->active)
-      {
-         image_info.image_src_ptr = reinterpret_cast<uint32_t *>(header);
-         image_info.image_size = header->image_size;
-      }
+      image_info.image_size = header_a->image_size;
    }
 
    // Need to put this in the header
@@ -133,15 +179,15 @@ void fw_image_execute(void)
 /**
  * @brief Validate an image in a given buffer by checking its CRC
  * 
- * @param image_buffer_ptr Pointer to buffer containing image
+ * @param image_buffer_ptr Pointer to buffer containing image. This must point at the header of the image.
  * @return image_error_e Result of validation.
  */
-image_error_e fw_image_validate(uint8_t *image_buffer_ptr)
+image_error_e fw_image_validate(uint8_t *image_header_ptr)
 {
-   fw_image_header_t *header = reinterpret_cast<fw_image_header_t *>(image_buffer_ptr);
+   fw_image_header_t *header = reinterpret_cast<fw_image_header_t *>(image_header_ptr);
 
    printf("CRC of incoming image in header is: %lx\r\n", header->crc32);
-   uint32_t *actual_image_ptr = reinterpret_cast<uint32_t *>(image_buffer_ptr + sizeof(fw_image_header_t));
+   uint32_t *actual_image_ptr = reinterpret_cast<uint32_t *>(image_header_ptr + sizeof(fw_image_header_t));
    uint32_t actual_image_size = header->image_size - sizeof(fw_image_header_t);
    uint32_t crc = crc32_func_ptr(actual_image_ptr, actual_image_size);
    printf("CRC of incoming image calculated as: %lx\r\n", crc);
