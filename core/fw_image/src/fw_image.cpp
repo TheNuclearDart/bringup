@@ -71,21 +71,16 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
 
    if (header->active)
    {
-      uint8_t *new_ptr = reinterpret_cast<uint8_t *>(image_ptr);
-
       // Calculate CRC
-      printf("CRC32 of new image is %lx\r\n", header->crc32);
-      uint32_t crc = crc32_func_ptr(reinterpret_cast<uint32_t *>(new_ptr + sizeof(fw_image_header_t)), (header->image_size - sizeof(fw_image_header_t)));
-      printf("Calculated CRC32 is %lx\r\n", crc);
+      image_error_e error = fw_image_validate(reinterpret_cast<uint8_t *>(image_ptr));
 
-      if (crc != header->crc32)
+      if (error != image_error_e::SUCCESS)
       {
-         printf("CRC doesn't match!\r\n");
-         return image_error_e::INVALID_IMAGE; // Need to try to boot other image then instead of failing out?
+         return error;
       }
 
       // Assign values to global struct
-      image_info.image_src_ptr = reinterpret_cast<uint32_t *>(new_ptr);
+      image_info.image_src_ptr = reinterpret_cast<uint32_t *>(image_ptr);
       image_info.image_size = header->image_size;
       
    }
