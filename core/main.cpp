@@ -322,26 +322,10 @@ int main(void)
    printf("fw_image_A_ptr = %lX\r\n", (uint32_t)fw_image_A_ptr);
    printf("fw_image_B_ptr = %lX\r\n", (uint32_t)fw_image_B_ptr);
    printf("image size = %lX\r\n", fw_image_size);
+   printf("This is a new image!! Again!!\r\n");
 
-   //printf("This is the new image!\r\n");
-   //uint32_t i = 0;
-   //bool pinState = false;
-   //GPIO_PinState writeVal = GPIO_PIN_SET;
    while (1)
    {
-      //printf("This is a printf test. i = %ld\r\n", i++);
-      // Trying to blink the first LED
-      //if (pinState)
-      //{
-      //   writeVal = GPIO_PIN_RESET;
-      //}
-      //else
-      //{
-      //   writeVal = GPIO_PIN_SET;
-      //}
-      //HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, writeVal);
-      //pinState = !pinState;
-      //HAL_Delay(1000);
       // All of this should be in its own thread once we have the OS??
       GPIO_PinState read_val = HAL_GPIO_ReadPin(USER_PUSH_BUTTON_PORT, USER_PUSH_BUTTON_PIN);
       if (read_val == GPIO_PIN_SET)
@@ -356,7 +340,7 @@ int main(void)
          }
          else if (error == UART::error::OKAY)
          {
-            printf("Image downloaded successfully!\r\n");
+            printf("Image downloaded successfully! Writing image to destination in flash...\r\n");
          }
          fw_update_error_e update_error = fw_update(fw_image_buffer);
          if (update_error != fw_update_error_e::SUCCESS)
