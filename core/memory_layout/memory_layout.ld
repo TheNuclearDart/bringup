@@ -5,9 +5,9 @@ _min_heap_size  = 0x200; /*Not sure that this is needed */
 
 MEMORY
 {
-   ITCM (xrw)    : ORIGIN = 0x00000000, LENGTH = 64K /*verify this length (I think it is wrong) */
+   ITCM (xrw)    : ORIGIN = 0x00000000, LENGTH = 16K /*verify this length (I think it is wrong) */
    DTCM (xrw)    : ORIGIN = 0x20000000, LENGTH = 64K
-   SRAM (xrw)    : ORIGIN = 0x20010000, LENGTH = 240K
+   SRAM (xrw)    : ORIGIN = 0x20010000, LENGTH = 240K /* Should this be bigger? */
    BL_FLASH (xr) : ORIGIN = 0x08000000, LENGTH = 64K  /* This is the region defined for the bootloader in flash. This is the first image loaded. */
    APP_FLASH(xr) : ORIGIN = 0x08010000, LENGTH = 240K /* Make this 0x70000 when we can support it(448KB... weird, probably bad size). Rignt now the entire image is in SRAM, so it needs to match that size! */
    /* APP_FLASH(xr) : ORIGIN = ?, LENGTH = ?  This is the entire application image region. Both will live here. */

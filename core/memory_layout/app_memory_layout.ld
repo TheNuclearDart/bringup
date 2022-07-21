@@ -4,6 +4,19 @@ ENTRY(reset_handler)
 
 SECTIONS
 {
+   /* Will this work? Block off the stack for the BL in SRAM, so that it isn't overwritten when loading? But then how do we reclaim it?
+      This might work, but we need a way to either have in the segment header the correct start address, or step over this chunk in the
+      bootloader, as right now we are just hitting the start of SRAM.
+   .bl_stack (NOLOAD) :
+   {
+      . = ALIGN(8);
+      end = .;
+      . = . + _min_heap_size;
+      . = . + _min_stack_size;
+      . = ALIGN(8);
+      _eblstack = .;
+   } > SRAM */
+
    .fw_header :
    {
       . = ALIGN(4);
