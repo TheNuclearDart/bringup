@@ -15,11 +15,24 @@ class SegmentHeader(ctypes.Structure):
                ('size'     , ctypes.c_uint32),
                ('rsvd'     , ctypes.c_uint8 * 8)]
 
+class FwHeader(ctypes.Structure):
+   _fields_ = [('active'    , ctypes.c_bool),
+               ('fw_version', ctypes.c_uint32),
+               ('image_size', ctypes.c_uint32),
+               ('entry_addr', ctypes.c_uint32),
+               ('crc32', ctypes.c_uint32),
+               ('rsvd', ctypes.c_uint8 * 108)]
+
+def auto_int(x):
+   return int(x,0)
+
 excluded_sections = ['.ARM.attributes', '.comment']
+app_image_path    = 'image.bin'
 
 parser = argparse.ArgumentParser(description="Build segment headers and full image")
 parser.add_argument("--elf-path", dest='elf_path', type=str, help='Path of .elf to create image from.')
 parser.add_argument("--sections-path", dest='sections_path', type=str, help='Path to .txt file containing list of sections')
+parser.add_argument('--hash', dest='hash', type=auto_int, help='Git Hash to be written to header.')
 args = parser.parse_args()
 
 print("Using file " + args.elf_path)
@@ -49,21 +62,55 @@ with open(args.sections_path) as sections:
 num_segments = len(section_dict)
 os.mkdir('binaries')
 print("Parsing %d sections") % num_segments
+entry_addr = 0
 for segment in section_dict:
    if segment['name'] not in excluded_sections and segment['flags'] != "ALLOC":
       print("Parsing segment: " + segment['name'])
       os.system('arm-none-eabi-objcopy -j %s -O binary %s ./binaries/%s_raw.bin' % (segment['name'], args.elf_path, segment['name']))
    
-      with open('image.bin', "ab+") as image_binary, open('./binaries/%s_raw.bin' % segment['name']) as raw_segment:
+      with open(app_image_path, "ab+") as image_binary, open('./binaries/%s_raw.bin' % segment['name']) as raw_segment:
          segment_header = SegmentHeader()
          segment_header.size = segment['size']
          segment_header.dest_addr = segment['lma']
 
-         # We don't want to lead
+         # We don't want to lead the fw_header with a segment header
          if segment['name'] != ".fw_header":
             image_binary.write(segment_header)
 
          # Now append the raw binary of the segment
          image_binary.write(raw_segment.read())
+
+         if segment['name'] == ".isr_vector":
+            entry_addr = segment['lma']
    else:
       print("Excluding segment: %s" % segment['name'])
+
+print("Git Hash is: " + hex(args.hash))
+
+#bin_path = "./blink.bin"
+fw_header_size = ctypes.sizeof(FwHeader)
+
+bin_size = os.path.getsize(app_image_path)
+print("Binary size: " + str(hex(bin_size)))
+
+binary = open(app_image_path, "rb+") # make this more generic
+
+
+binary.seek(fw_header_size)
+binary_byte_array = binary.read()
+crc32 = zlib.crc32(binary_byte_array)
+crc32 = crc32 & 0xffffffff
+print("CRC32 calculated as " + str(hex(crc32)))
+print("Entry address is " + str(hex(entry_addr)))
+
+fw_header = FwHeader()
+
+binary.readinto(fw_header)
+fw_header.active = True # Default to true, fw update process will clear the active flag of an old image in flash.
+fw_header.fw_version = args.hash
+fw_header.image_size = bin_size
+fw_header.entry_addr = entry_addr
+fw_header.crc32 = crc32
+binary.seek(0)
+binary.write(fw_header)
+binary.close()
