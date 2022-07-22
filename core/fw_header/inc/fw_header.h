@@ -9,8 +9,9 @@ typedef struct _fw_image_header_t
    bool active;
    uint32_t fw_version; // if needed
    uint32_t image_size;
+   uint32_t entry_addr;
    uint32_t crc32;
-   uint8_t  rsvd[112]; // Pad out to fill space
+   uint8_t  rsvd[108]; // Pad out to fill space
 } fw_image_header_t;
 
 typedef struct _segment_header_t

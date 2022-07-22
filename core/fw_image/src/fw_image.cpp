@@ -15,7 +15,8 @@ typedef struct _image_info_t
 } image_info_t;
 
 // local functions
-static void          relocate_image(uint32_t *image_ptr, uint32_t *dest_ptr, uint32_t image_size);
+static void          relocate_image(uint8_t *image_ptr, uint32_t image_size);
+static uint32_t      handle_segment(segment_header_t *segment_addr);
 static image_error_e find_validate_image(uint32_t *image_addr);
 
 namespace 
@@ -41,7 +42,7 @@ image_error_e fw_image_load(void)
       return error;
    }
 
-   relocate_image(image_info.image_src_ptr, image_info.image_dest_ptr, image_info.image_size); // Copy everything including header
+   relocate_image(reinterpret_cast<uint8_t *>(image_info.image_src_ptr), image_info.image_size); // Copy everything including header
 
    return image_error_e::SUCCESS;
 }
@@ -52,9 +53,28 @@ image_error_e fw_image_load(void)
  * @param image_addr location of image
  * @param dest_addr destination for image (SRAM, etc)
  */
-static void relocate_image(uint32_t *image_ptr, uint32_t *dest_ptr, uint32_t size)
+static void relocate_image(uint8_t *image_ptr, uint32_t size)
 {
-   memcpy(dest_ptr, image_ptr, size);
+   uint32_t total_bytes = sizeof(fw_image_header_t);
+   segment_header_t *segment_header = reinterpret_cast<segment_header_t *>(image_ptr + sizeof(fw_image_header_t));
+   
+   do
+   {
+      uint32_t bytes_moved = handle_segment(segment_header);
+      total_bytes += (bytes_moved + sizeof(segment_header_t));
+      segment_header = reinterpret_cast<segment_header_t *>(reinterpret_cast<uint8_t *>(segment_header) + sizeof(segment_header_t) + bytes_moved);
+   } while (total_bytes != size);
+}
+
+static uint32_t handle_segment(segment_header_t *segment_header)
+{
+   uint32_t segment_size = segment_header->size;
+   uint8_t *segment_dest = reinterpret_cast<uint8_t *>(segment_header->dest_addr);
+   uint8_t *segment_src  = reinterpret_cast<uint8_t *>(segment_header) + sizeof(segment_header_t);
+
+   memcpy(segment_dest, segment_src, segment_size);
+
+   return segment_size;
 }
 
 /**
@@ -89,6 +109,7 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
          // Assign values to global struct
          image_info.image_src_ptr = reinterpret_cast<uint32_t *>(image_ptr);
          image_info.image_size = header_a->image_size;
+         image_info.image_dest_ptr = reinterpret_cast<uint32_t *>(header_a->entry_addr);
       }
    }
    // Now check image B's header if the image is active, or we're falling back on it.
@@ -122,6 +143,7 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
          printf("Image B is valid!\r\n");
          image_info.image_src_ptr = reinterpret_cast<uint32_t *>(header_b);
          image_info.image_size = header_b->image_size;
+         image_info.image_dest_ptr = reinterpret_cast<uint32_t *>(header_b->entry_addr);
       }
    }
    // B was active but failed, so fallback on A
@@ -138,11 +160,8 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
       // Assign values to global struct
       image_info.image_src_ptr = reinterpret_cast<uint32_t *>(image_ptr);
       image_info.image_size = header_a->image_size;
+      image_info.image_dest_ptr = reinterpret_cast<uint32_t *>(header_a->entry_addr);
    }
-
-   // Need to put this in the header
-   uint32_t *sram_start_ptr = &__sram_start__; // Need to think about this, maybe the image header or something should have the start addr?
-   image_info.image_dest_ptr = sram_start_ptr;
 
    return image_error_e::SUCCESS;
 }
@@ -156,7 +175,6 @@ void fw_image_execute(void)
 {
    // Set stack pointer to start of image. Image _should_ reset it to what it desires in it's own startup
    uint8_t *new_ptr = reinterpret_cast<uint8_t *>(image_info.image_dest_ptr);
-   new_ptr += fw_header_get_header_size(); // Step over the fw header
    
    __set_MSP(reinterpret_cast<uint32_t>(new_ptr)); // The first word after the header is the address of the end of the stack.
    
