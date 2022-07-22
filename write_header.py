@@ -18,17 +18,18 @@ def auto_int(x):
 
 parser = argparse.ArgumentParser(description="Write FW package header")
 parser.add_argument('--hash', dest='hash', type=auto_int, help='Git Hash to be written to header.')
+parser.add_argument('--bin-path', dest='bin_path', type=str, help='Path to bin to modify.')
 args = parser.parse_args()
 
 print("Git Hash is: " + hex(args.hash))
 
-bin_path = "./blink.bin"
+#bin_path = "./blink.bin"
 fw_header_size = ctypes.sizeof(FwHeader)
 
-bin_size = os.path.getsize(bin_path)
+bin_size = os.path.getsize(args.bin_path)
 print("Binary size: " + str(hex(bin_size)))
 
-binary = open(bin_path, "rb+") # make this more generic
+binary = open(args.bin_path, "rb+") # make this more generic
 
 
 binary.seek(fw_header_size)
