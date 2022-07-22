@@ -306,7 +306,7 @@ int main(void)
 
    uart.init();
    printf("Print initialized in main app!\r\n");
-   printf("FW Version: %lx\r\nCRC: %lx\r\n", fw_header_get_current_header()->fw_version, fw_header_get_current_header()->crc32);
+   printf("FW Version (not accurate due to segment parsing): %lx\r\nCRC(also bad): %lx\r\n", fw_header_get_current_header()->fw_version, fw_header_get_current_header()->crc32);
    // Check the image header and print which image we're running out of
    fw_image_header_t *header_a = reinterpret_cast<fw_image_header_t *>(fw_image_A_ptr);
    fw_image_header_t *header_b = reinterpret_cast<fw_image_header_t *>(fw_image_B_ptr);
