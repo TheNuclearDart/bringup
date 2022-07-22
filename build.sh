@@ -10,7 +10,7 @@ else
    make -j 8
    hash=$(git rev-parse --short HEAD)
    # Concatenate the .bins into one larger binary.
-   python ../write_header.py --hash 0x$hash
+   python ../write_header.py --hash 0x$hash --bin-path ./blink.bin
    cat ./core/bootloader/bootloader.bin ./blink.bin > full_image.bin
    echo "Full image built at ./build/full_image.bin"
 fi
