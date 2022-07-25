@@ -69,28 +69,35 @@ except OSError:
    pass
 os.mkdir('binaries')
 print("Parsing %d sections") % num_segments
-entry_addr = 0
-for segment in section_dict:
-   if segment['name'] not in excluded_sections and segment['flags'] != "ALLOC":
-      print("Parsing segment: " + segment['name'])
-      os.system('arm-none-eabi-objcopy -j %s -O binary %s ./binaries/%s_raw.bin' % (segment['name'], args.elf_path, segment['name']))
+
+fw_header = FwHeader()
+with open(app_image_path, "ab+") as image_binary:
+   # write an empty header to the start of the binary
+   image_binary.write(fw_header)
    
-      with open(app_image_path, "ab+") as image_binary, open('./binaries/%s_raw.bin' % segment['name']) as raw_segment:
-         segment_header = SegmentHeader()
-         segment_header.size = segment['size']
-         segment_header.dest_addr = segment['lma']
+   entry_addr = 0
+   for segment in section_dict:
+      if segment['name'] not in excluded_sections and segment['flags'] != "ALLOC":
+         print("Parsing segment: " + segment['name'])
+         os.system('arm-none-eabi-objcopy -j %s -O binary %s ./binaries/%s_raw.bin' % (segment['name'], args.elf_path, segment['name']))
+   
+         with open('./binaries/%s_raw.bin' % segment['name']) as raw_segment:
+            segment_header = SegmentHeader()
+            segment_header.size = segment['size']
+            segment_header.dest_addr = segment['lma']
 
-         # We don't want to lead the fw_header with a segment header
-         if segment['name'] != ".fw_header":
-            image_binary.write(segment_header)
+            # We don't want to lead the fw_header with a segment header
+            # Is this guard needed anymore?
+            if segment['name'] != ".fw_header":
+               image_binary.write(segment_header)
 
-         # Now append the raw binary of the segment
-         image_binary.write(raw_segment.read())
+            # Now append the raw binary of the segment
+            image_binary.write(raw_segment.read())
 
-         if segment['name'] == ".isr_vector":
-            entry_addr = segment['lma']
-   else:
-      print("Excluding segment: %s" % segment['name'])
+            if segment['name'] == ".isr_vector":
+               entry_addr = segment['lma']
+      else:
+         print("Excluding segment: %s" % segment['name'])
 
 print("Git Hash is: " + hex(args.hash))
 
@@ -101,7 +108,6 @@ print("Binary size: " + str(hex(bin_size)))
 
 binary = open(app_image_path, "rb+") # make this more generic
 
-
 binary.seek(fw_header_size)
 binary_byte_array = binary.read()
 crc32 = zlib.crc32(binary_byte_array)
@@ -109,8 +115,9 @@ crc32 = crc32 & 0xffffffff
 print("CRC32 calculated as " + str(hex(crc32)))
 print("Entry address is " + str(hex(entry_addr)))
 
-fw_header = FwHeader()
+#fw_header = FwHeader()
 
+# Now populate the empty header at the start of the image
 binary.readinto(fw_header)
 fw_header.active = True # Default to true, fw update process will clear the active flag of an old image in flash.
 fw_header.fw_version = args.hash
