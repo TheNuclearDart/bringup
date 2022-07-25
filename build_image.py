@@ -1,5 +1,6 @@
 import sys
 import os
+import shutil
 
 import argparse
 import ctypes
@@ -60,6 +61,12 @@ with open(args.sections_path) as sections:
 
 # Now that we have a list of sections and their sizes, we can create segment binaries
 num_segments = len(section_dict)
+try:
+   # Clean up old images before rebuilding
+   shutil.rmtree('binaries')
+   os.remove(app_image_path)
+except OSError:
+   pass
 os.mkdir('binaries')
 print("Parsing %d sections") % num_segments
 entry_addr = 0
@@ -87,7 +94,6 @@ for segment in section_dict:
 
 print("Git Hash is: " + hex(args.hash))
 
-#bin_path = "./blink.bin"
 fw_header_size = ctypes.sizeof(FwHeader)
 
 bin_size = os.path.getsize(app_image_path)
