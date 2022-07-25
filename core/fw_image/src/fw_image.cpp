@@ -6,6 +6,7 @@
 #include "fw_header.h"
 #include "fw_image.h"
 #include "memory_layout.h"
+#include "shared_data.h"
 
 typedef struct _image_info_t
 {
@@ -110,6 +111,8 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
          image_info.image_src_ptr = reinterpret_cast<uint32_t *>(image_ptr);
          image_info.image_size = header_a->image_size;
          image_info.image_dest_ptr = reinterpret_cast<uint32_t *>(header_a->entry_addr);
+         // Populate the shared data SRAM region with active header
+         shared_data_populate_active_fw_header(header_a);
       }
    }
    // Now check image B's header if the image is active, or we're falling back on it.
@@ -144,6 +147,9 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
          image_info.image_src_ptr = reinterpret_cast<uint32_t *>(header_b);
          image_info.image_size = header_b->image_size;
          image_info.image_dest_ptr = reinterpret_cast<uint32_t *>(header_b->entry_addr);
+
+         // Populate the shared data SRAM region with active header
+         shared_data_populate_active_fw_header(header_b);
       }
    }
    // B was active but failed, so fallback on A
@@ -161,6 +167,9 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
       image_info.image_src_ptr = reinterpret_cast<uint32_t *>(image_ptr);
       image_info.image_size = header_a->image_size;
       image_info.image_dest_ptr = reinterpret_cast<uint32_t *>(header_a->entry_addr);
+
+      // Populate the shared data SRAM region with active header
+      shared_data_populate_active_fw_header(header_a);
    }
 
    return image_error_e::SUCCESS;

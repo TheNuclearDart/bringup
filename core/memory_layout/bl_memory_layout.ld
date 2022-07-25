@@ -4,6 +4,15 @@ ENTRY(reset_handler)
 
 SECTIONS
 {
+   .shared_data (NOLOAD):
+   {
+      . = ALIGN(4);
+      __shared_data_start__ = .;
+      KEEP(*(.shared_data))
+      . = ALIGN(4);
+      __shared_data_end__ = .;
+   } > SRAM
+
    .isr_vector :
    {
       . = ALIGN(4);

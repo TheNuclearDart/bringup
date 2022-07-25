@@ -17,11 +17,13 @@ SECTIONS
       _eblstack = .;
    } > SRAM */
 
-   .fw_header :
+   .shared_data (NOLOAD):
    {
       . = ALIGN(4);
-      KEEP(*(.fw_header))
+      __shared_data_start__ = .;
+      KEEP(*(.shared_data))
       . = ALIGN(4);
+      __shared_data_end__ = .;
    } > SRAM
 
    .isr_vector :

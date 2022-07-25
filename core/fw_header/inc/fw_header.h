@@ -21,7 +21,4 @@ typedef struct _segment_header_t
    uint8_t  rsvd[8];
 } segment_header_t;
 
-fw_image_header_t *fw_header_get_current_header(void);
-uint32_t           fw_header_get_header_size(void);
-
 #endif
