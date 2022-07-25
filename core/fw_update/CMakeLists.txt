@@ -17,4 +17,4 @@ target_include_directories(${TARGET} PUBLIC
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Inc
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Legacy
 )
-target_link_libraries(${TARGET} flash fw_header fw_image)
+target_link_libraries(${TARGET} flash fw_image)

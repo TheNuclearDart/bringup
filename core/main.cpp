@@ -10,7 +10,7 @@
 #include "syscalls.h"
 
 #include "crc.h"
-#include "fw_header.h"
+#include "shared_data.h"
 #include "fw_image.h"
 #include "fw_update.h"
 #include "gpio_defines.h"
@@ -306,7 +306,7 @@ int main(void)
 
    uart.init();
    printf("Print initialized in main app!\r\n");
-   printf("FW Version (not accurate due to segment parsing): %lx\r\nCRC(also bad): %lx\r\n", fw_header_get_current_header()->fw_version, fw_header_get_current_header()->crc32);
+   printf("FW Version: %lx\r\nCRC: %lx\r\n", shared_data_get_active_fw_header()->fw_version, shared_data_get_active_fw_header()->crc32);
    // Check the image header and print which image we're running out of
    fw_image_header_t *header_a = reinterpret_cast<fw_image_header_t *>(fw_image_A_ptr);
    fw_image_header_t *header_b = reinterpret_cast<fw_image_header_t *>(fw_image_B_ptr);
@@ -319,9 +319,6 @@ int main(void)
    printf("LCD initialized!\r\n");
 
    printf("Initialization complete, beginning main loop\r\n");
-   printf("fw_image_A_ptr = %lX\r\n", (uint32_t)fw_image_A_ptr);
-   printf("fw_image_B_ptr = %lX\r\n", (uint32_t)fw_image_B_ptr);
-   printf("image size = %lX\r\n", fw_image_size);
 
    while (1)
    {
