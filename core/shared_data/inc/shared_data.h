@@ -7,7 +7,7 @@
 typedef struct _shared_data_t
 {
    fw_image_header_t active_fw_header;
-   uint8_t     rsvd[512 - sizeof(fw_image_header_t)];
+   uint8_t           rsvd[128 - sizeof(fw_image_header_t)];
 } shared_data_t;
 
 fw_image_header_t *shared_data_get_active_fw_header(void);

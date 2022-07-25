@@ -21,8 +21,7 @@ class FwHeader(ctypes.Structure):
                ('fw_version', ctypes.c_uint32),
                ('image_size', ctypes.c_uint32),
                ('entry_addr', ctypes.c_uint32),
-               ('crc32', ctypes.c_uint32),
-               ('rsvd', ctypes.c_uint8 * 108)]
+               ('crc32', ctypes.c_uint32)]
 
 def auto_int(x):
    return int(x,0)
