@@ -1,5 +1,6 @@
 // Std lib stubs and implementations
 
+#include "memory_layout.h"
 #include "syscalls.h"
 #include <stdio.h>
 
@@ -15,14 +16,16 @@ int _write(int file, char *ptr, int len)
    return len;
 }
 
-// Dummy. May need to implement
+// Absolutely needed for printf
 caddr_t _sbrk(int incr)
 {
-   (void)incr;
+   uint8_t *heap = &end; // This 'end' is the start of the heap, defined in .ld script
 
-   caddr_t ret = 0;
+   uint8_t *prev_heap = heap;
 
-   return ret;
+   heap += incr;
+
+   return (caddr_t)prev_heap;
 }
 
 int _close(int file) {
@@ -79,7 +82,7 @@ int _stat(char* file, struct stat* st) {
   return -1;
 }
 
-int _link(char* old, char* new) {
+int _link(char* old, char* new_char) {
 
   return -1;
 }
