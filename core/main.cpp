@@ -298,7 +298,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(USER_PUSH_BUTTON_PORT, &GPIO_InitStruct);
 }
 
-int main(void)
+ITCM_CODE int main(void)
 {
    HAL_Init(); // Init ST Provided HAL
    SystemClock_Config(); // Initialize system clocks

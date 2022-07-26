@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "fw_image.h"
+#include "memory_layout.h"
 
 enum class fw_update_error_e
 {
@@ -11,6 +12,6 @@ enum class fw_update_error_e
    SUCCESS
 };
 
-fw_update_error_e fw_update(uint8_t *image_buffer_ptr);
+ITCM_CODE fw_update_error_e fw_update(uint8_t *image_buffer_ptr);
 
 #endif
