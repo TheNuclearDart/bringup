@@ -7,6 +7,7 @@
 #include "lcd.h"
 #include "main_task_msgs.h"
 #include "queue.h"
+#include "syscalls.h"
 #include "uart.h"
 
 namespace

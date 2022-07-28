@@ -26,24 +26,10 @@
 namespace
 {
    // Need to decouple this more from the HAL
-   UART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, 1000);
-   LCD lcd;
-   uint8_t fw_image_buffer[0x10000]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
+   //UART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, 1000);
+   //LCD lcd;
+   //uint8_t fw_image_buffer[0x10000]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
    //USB_Host usb;
-}
-
-// These need to live in a separate file, not sure where yet, maybe something with print.cpp
-// Also not sure how to use them with a single instance of Print
-#ifdef __GNUC__
-#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#endif
-
-PUTCHAR_PROTOTYPE
-{
-   uart.out(ch, 1);
-   return ch;
 }
 
 // Taken from cubemx generated code. Should try to understand.
@@ -325,9 +311,13 @@ ITCM_CODE int main(void)
    // After HW init, tasks will be created here, and then we will move to the main_task function for the actual while(1) loop.
    // The flow will be call every task's init function, once done, then create the tasks, and start the scheduler
 
+   // Initialize the tasks using their init functions _BEFORE_ starting the scheduler
+   main_task_init();
+   input_task_init();
+
    // Create the tasks. Would be better using an array of them or something
-   xTaskCreate(main_task, "main", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-   xTaskCreate(input_task, "input", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+   xTaskCreate(main_task, "main", 0x400, NULL, tskIDLE_PRIORITY + 1, NULL);
+   xTaskCreate(input_task, "input", 0x400, NULL, tskIDLE_PRIORITY + 1, NULL);
 
    vTaskStartScheduler();
 
