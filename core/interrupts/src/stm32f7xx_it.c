@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 #include "stm32f7xx_it.h"
-#include "stm32f7xx_hal.h"
+#include "stm32f7xx.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -235,13 +235,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 /* USER CODE BEGIN 1 */
 // Not sure if these are peripheral or ARM exception. Defining them so we don't fall into default handler(infinite loop)
-void PendSV_Handler(void)
+__weak void PendSV_Handler(void)
 {
    while(1)
    {}
 }
 
-void SysTick_Handler(void)
+__weak void SysTick_Handler(void)
 {
    while(1)
    {}

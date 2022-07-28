@@ -11,12 +11,16 @@
 #include "crc.h"
 #include "shared_data.h"
 #include "fw_image.h"
+#include "fw_tasks.h"
 #include "fw_update.h"
 #include "gpio_defines.h"
 #include "memory_layout.h" // Temporary
 #include "lcd.h"
 #include "uart.h"
 #include "usb_host.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
 
 // File local variables
 namespace
@@ -303,26 +307,35 @@ ITCM_CODE int main(void)
    SystemClock_Config(); // Initialize system clocks
    MX_GPIO_Init(); // This needs replacing or fixing, wasn't needed for UART like thought
 
-   uart.init();
-   printf("Print initialized in main app!\r\n");
-   printf("FW Version: %lx\r\nCRC: %lx\r\n", shared_data_get_active_fw_header()->fw_version, shared_data_get_active_fw_header()->crc32);
+   // DOne in main task for now. uart.init(); // Because of this, printf is likely not going to work in other tasks, until we get uart as its own thing
+   //printf("Print initialized in main app!\r\n");
+   //printf("FW Version: %lx\r\nCRC: %lx\r\n", shared_data_get_active_fw_header()->fw_version, shared_data_get_active_fw_header()->crc32);
    // Check the image header and print which image we're running out of
-   fw_image_header_t *header_a = reinterpret_cast<fw_image_header_t *>(fw_image_A_ptr);
-   fw_image_header_t *header_b = reinterpret_cast<fw_image_header_t *>(fw_image_B_ptr);
-   printf("FLASH Header Active: \r\nA: %lX\r\nB: %lX\r\n", (uint32_t)header_a->active, (uint32_t)header_b->active);
+   //fw_image_header_t *header_a = reinterpret_cast<fw_image_header_t *>(fw_image_A_ptr);
+   //fw_image_header_t *header_b = reinterpret_cast<fw_image_header_t *>(fw_image_B_ptr);
+   //printf("FLASH Header Active: \r\nA: %lX\r\nB: %lX\r\n", (uint32_t)header_a->active, (uint32_t)header_b->active);
    //usb.start(); // Start USB host. Was initialized at declaration
 
-   lcd.init();
-   crc_init();
-   fw_image_init(&crc32_calculate); // I feel like I need a different solution for this.
-   printf("LCD initialized!\r\n");
+   //Done in main tasklcd.init();
+   //crc_init();
+   //fw_image_init(&crc32_calculate); // I feel like I need a different solution for this.
+   //printf("LCD initialized!\r\n");
 
-   printf("Initialization complete, beginning main loop\r\n");
+   //printf("Initialization complete, beginning main loop\r\n");
+   // After HW init, tasks will be created here, and then we will move to the main_task function for the actual while(1) loop.
+   // The flow will be call every task's init function, once done, then create the tasks, and start the scheduler
+
+   // Create the tasks. Would be better using an array of them or something
+   xTaskCreate(main_task, "main", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+   xTaskCreate(input_task, "input", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+
+   vTaskStartScheduler();
 
    while (1)
    {
+      /* Should never reach with OS */
       // All of this should be in its own thread once we have the OS??
-      GPIO_PinState read_val = HAL_GPIO_ReadPin(USER_PUSH_BUTTON_PORT, USER_PUSH_BUTTON_PIN);
+      /*GPIO_PinState read_val = HAL_GPIO_ReadPin(USER_PUSH_BUTTON_PORT, USER_PUSH_BUTTON_PIN);
       if (read_val == GPIO_PIN_SET)
       {
          printf("FW Update Process Triggered.\r\n");
@@ -348,7 +361,7 @@ ITCM_CODE int main(void)
             NVIC_SystemReset();
          }
       }
-      //usb.process();
+      //usb.process();*/
    }
 
    return 1;
