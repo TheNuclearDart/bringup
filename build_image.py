@@ -43,7 +43,7 @@ with open(args.sections_path) as sections:
    num_lines = (len(sections.readlines()) - 5)
 
 with open(args.sections_path) as sections:
-   section_dict = [{}] * (num_lines / 2)
+   section_dict = [{}] * int((num_lines / 2))
    print('Number of sections is ' + str(num_lines))
    for x in range(5):
       next(sections)
@@ -67,7 +67,7 @@ try:
 except OSError:
    pass
 os.mkdir('binaries')
-print("Parsing %d sections") % num_segments
+print("Parsing %d sections" % num_segments)
 
 fw_header = FwHeader()
 with open(app_image_path, "ab+") as image_binary:
@@ -80,7 +80,7 @@ with open(app_image_path, "ab+") as image_binary:
          print("Parsing segment: " + segment['name'])
          os.system('arm-none-eabi-objcopy -j %s -O binary %s ./binaries/%s_raw.bin' % (segment['name'], args.elf_path, segment['name']))
    
-         with open('./binaries/%s_raw.bin' % segment['name']) as raw_segment:
+         with open('./binaries/%s_raw.bin' % segment['name'], "rb+") as raw_segment:
             segment_header = SegmentHeader()
             segment_header.size = segment['size']
             segment_header.dest_addr = segment['lma']
