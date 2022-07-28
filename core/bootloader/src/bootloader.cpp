@@ -5,8 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "stm32f746xx.h"
-#include "stm32f7xx_hal.h"
+#include "stm32f7xx.h"
 #include "syscalls.h"
 
 #include "crc.h"

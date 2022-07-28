@@ -8,6 +8,7 @@ add_library(${TARGET} ${SRC})
 
 target_include_directories(${TARGET} PUBLIC
    ${CMAKE_CURRENT_LIST_DIR}/inc
+   ${CMAKE_SOURCE_DIR}/core/board_defines/inc
    ${CMAKE_SOURCE_DIR}/core/fw_header/inc
    ${CMAKE_SOURCE_DIR}/core/memory_layout/inc
    ${CMAKE_SOURCE_DIR}/core/shared_data/inc

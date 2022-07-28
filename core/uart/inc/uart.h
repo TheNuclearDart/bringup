@@ -2,7 +2,6 @@
 #define __UART_H
 
 #include "stm32f7xx.h"
-#include "stm32f7xx_hal.h"
 
 class UART
 {

@@ -1,7 +1,7 @@
 #include <cstring>
 #include <stdio.h>
 
-#include "stm32f746xx.h"
+#include "stm32f7xx.h"
 
 #include "fw_header.h"
 #include "fw_image.h"
