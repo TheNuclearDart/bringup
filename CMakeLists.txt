@@ -30,6 +30,18 @@ set(SRC
    ${CMAKE_CURRENT_LIST_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.c
    ${CMAKE_CURRENT_LIST_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.c
    ${CMAKE_CURRENT_LIST_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.c
+   # FreeRTOS Support
+   ${CMAKE_CURRENT_LIST_DIR}/core/freertos_hooks.c
+   # FreeRTOS source
+   ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/croutine.c
+   ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/event_groups.c
+   ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/list.c
+   ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/queue.c
+   ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/stream_buffer.c
+   ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/tasks.c
+   ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/timers.c
+   ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/port.c
+   ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/portable/MemMang/heap_4.c
 )
 # Build the application executable
 add_executable(${TARGET} ${SRC})
@@ -46,6 +58,9 @@ target_include_directories(${TARGET} PUBLIC
    ${CMAKE_CURRENT_LIST_DIR}/drivers/CMSIS/Device/ST/STM32F7xx/Include
    ${CMAKE_CURRENT_LIST_DIR}/drivers/STM32F7xx_HAL_Driver/Inc
    ${CMAKE_CURRENT_LIST_DIR}/drivers/STM32F7xx_HAL_Driver/Legacy
+   # FreeRTOS
+   ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/include
+   ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1
 )
 
 add_compile_definitions(STM32F746xx USE_HAL_DRIVER USE_FULL_ASSERT)
@@ -58,12 +73,13 @@ add_subdirectory(core/assert)
 add_subdirectory(core/crc)
 add_subdirectory(core/flash)
 add_subdirectory(core/fw_image)
+add_subdirectory(core/fw_tasks)
 add_subdirectory(core/fw_update)
 add_subdirectory(core/lcd)
 add_subdirectory(core/shared_data)
 add_subdirectory(core/uart)
 add_subdirectory(core/usb_host)
-target_link_libraries(${TARGET} assert crc flash fw_image fw_update lcd shared_data uart usb_host)
+target_link_libraries(${TARGET} assert crc flash fw_image fw_tasks fw_update lcd shared_data uart usb_host)
 # Strip out the debug sections from the .elf for breaking up into the binary, but leave the old .elf for debugging
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objcopy -g ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.elf ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}_stripped.elf)
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objdump -h ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}_stripped.elf > ${CMAKE_CURRENT_LIST_DIR}/build/sections.txt)
