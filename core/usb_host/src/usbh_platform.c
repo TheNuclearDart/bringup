@@ -22,7 +22,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbh_platform.h"
 
-#include "stm32f7xx_hal.h"
+#include "stm32f7xx.h"
 
 /* USER CODE BEGIN INCLUDE */
 

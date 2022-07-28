@@ -26,7 +26,6 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f7xx.h"  /* replace 'stm32xxx' with your HAL driver header filename, ex: stm32f4xx.h */
-#include "stm32f7xx_hal.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
