@@ -82,6 +82,9 @@ void handle_request(main_req_msg_u &req_msg)
 
 void main_task(void *task_params)
 {
+   /* Printf is currently not working with strings longer than 12 chars, not sure why. I need to move away from this print model anyway,
+      but this isn't a great indication of the health of my newlib nano implementation with FreeRTOS. */
+   //printf("Why?\r\n");
    while(1)
    {
       main_req_msg_u  req_msg  = {};
