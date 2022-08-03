@@ -4,6 +4,11 @@
 #include "syscalls.h"
 #include <stdio.h>
 
+#if !BOOTLOADER_BUILD
+   #include "FreeRTOS.h"
+   #include "task.h"
+#endif
+
 int _write(int file, char *ptr, int len)
 {
    int DataIdx;
@@ -17,6 +22,7 @@ int _write(int file, char *ptr, int len)
 }
 
 // Absolutely needed for printf
+// Maybe this is too simple for FreeRtos?? But it seems like we never reach here anyway.
 caddr_t _sbrk(int incr)
 {
    uint8_t *heap = &end; // This 'end' is the start of the heap, defined in .ld script
@@ -96,3 +102,15 @@ int _execve(char* name, char** argv, char** env) {
 
   return -1;
 }
+
+#if !BOOTLOADER_BUILD
+void __malloc_lock (struct _reent *reent)
+{
+   vTaskSuspendAll();
+}
+
+void __malloc_unlock(struct _reent *reent)
+{
+   xTaskResumeAll();
+}
+#endif
