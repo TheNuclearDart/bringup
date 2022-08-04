@@ -19,6 +19,7 @@ enum class MainOpcode
 {
    UNDEFINED,
    INPUT_NOTIFICATION,
+   XMODEM_RECEIVE,
 };
 
 /* Request Messages */
