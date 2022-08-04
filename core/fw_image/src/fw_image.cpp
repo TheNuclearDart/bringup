@@ -23,7 +23,7 @@ static image_error_e find_validate_image(uint32_t *image_addr);
 namespace 
 {
    // local data
-   image_info_t image_info = {0};
+   image_info_t image_info = {};
    uint32_t (*crc32_func_ptr)(uint32_t *buffer, uint32_t length); // Function pointer for calculating CRC
 }
 
