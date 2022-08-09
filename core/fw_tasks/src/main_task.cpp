@@ -23,7 +23,6 @@ namespace
    LCD lcd;
    uint8_t fw_image_buffer[0x10000]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
    generic_task_ctx_t uart_ctx;
-   bool fw_update_in_progress = false; // Temporary solution to multiple blue button inputs
    Print main_print("main");
    //USB_Host usb;
 }
@@ -152,15 +151,15 @@ void handle_resp(generic_resp_msg_t &resp_msg)
 
 void main_task(void *task_params)
 {
-   /* Printf is currently not working with strings longer than 12 chars, not sure why. I need to move away from this print model anyway,
-      but this isn't a great indication of the health of my newlib nano implementation with FreeRTOS. */
-   //printf("Why?\r\n");
    main_print.out("Starting main task loop.\r\n");
-   //print("Test\r\n");
+
    while(1)
    {
       main_req_msg_u     req_msg  = {};
       generic_resp_msg_t resp_msg = {};
+
+      main_print.handle_queue();
+
       if (xQueueReceive(main_resp_queue, &resp_msg, 0) == pdTRUE)
       {
          handle_resp(resp_msg);
