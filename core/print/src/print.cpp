@@ -2,12 +2,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "assert.h"
 #include "print.h"
 
 #include "uart_task_msgs.h"
 
 namespace
 {
+   bool overall_print_in_progress = false;
 }
 
 void Print::puts(const char *str)
@@ -17,6 +20,55 @@ void Print::puts(const char *str)
       this->print_accumulate(*str);
    }
 }
+
+void Print::add_to_queue(const uart_print_req_t &print_req)
+{
+   if (this->print_queue.head_idx == (this->print_queue.tail_idx - 1))
+   {
+      // Full queue, assert for now
+      assert_param(0);
+   }
+   memcpy(&this->print_queue.queued_reqs[this->print_queue.head_idx], &print_req, sizeof(print_req));
+   if (this->print_queue.head_idx < (PRINT_QUEUE_SIZE - 1))
+   {
+      this->print_queue.head_idx++;
+   }
+   else
+   {
+      this->print_queue.head_idx = 0;
+   }
+}
+
+void Print::handle_queue(void)
+{
+   // Check if the queue is empty
+   if (!(this->print_queue.head_idx == this->print_queue.tail_idx))
+   {
+      if (!overall_print_in_progress)
+      {
+         this->print_in_progress   = true;
+         overall_print_in_progress = true;
+      }
+      if (this->print_in_progress)
+      {
+         while (this->print_queue.head_idx != this->print_queue.tail_idx)
+         {
+            xQueueSend(uart_req_queue, &this->print_queue.queued_reqs[this->print_queue.tail_idx], UINT32_MAX);
+            if (this->print_queue.tail_idx < (PRINT_QUEUE_SIZE - 1))
+            {
+               this->print_queue.tail_idx++;
+            }
+            else
+            {
+               this->print_queue.tail_idx = 0;
+            }
+         }
+         this->print_in_progress   = false;
+         overall_print_in_progress = false;
+      }
+   }
+}
+
 /**
  * @brief Accumulate bytes into buffer, once full, send a message to print it
  * 
@@ -30,10 +82,33 @@ void Print::print_accumulate(const uint8_t &data)
       uart_print_req_t print_req = {};
       memcpy(&print_req.output, &print_buffer, MAX_PRINT_SIZE);
       print_req.hdr.opcode = static_cast<uint32_t>(UartOpcode::PRINT);
-      print_req.msg_size = this->print_buffer_bytes;
+      print_req.msg_size   = this->print_buffer_bytes;
 
-      xQueueSend(uart_req_queue, &print_req, UINT32_MAX);
-      this->print_buffer_bytes = 0;
+      if (!overall_print_in_progress)
+      {
+         overall_print_in_progress = true;
+         this->print_in_progress   = true;
+      }
+
+      if (overall_print_in_progress)
+      {
+         if (this->print_in_progress)
+         {
+            xQueueSend(uart_req_queue, &print_req, UINT32_MAX);
+            this->print_buffer_bytes = 0;
+         }
+         else
+         {
+            this->add_to_queue(print_req);
+            this->print_buffer_bytes = 0;
+         }
+      }
+
+      if (data == '\0' && this->print_in_progress)
+      {
+         this->print_in_progress   = false;
+         overall_print_in_progress = false;
+      }
    }
 
    if (data != '\0')
