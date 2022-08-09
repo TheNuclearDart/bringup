@@ -1,6 +1,7 @@
 #include "stm32f7xx.h"
 #include "fw_tasks.h"
 #include "gpio_defines.h"
+#include "print.h"
 #include "queue.h"
 #include "uart.h"
 
@@ -14,20 +15,6 @@ namespace
 
 QueueHandle_t uart_req_queue;
 QueueHandle_t uart_resp_queue;
-
-// These need to live in a separate file, not sure where yet, maybe something with print.cpp
-// Not sure if this is needed in this task, I don't think it will be but throwing it here for now.
-#ifdef __GNUC__
-#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#endif
-
-PUTCHAR_PROTOTYPE
-{
-   uart.out(ch, 1);
-   return ch;
-}
 
 void uart_task_init(void)
 {
@@ -94,8 +81,9 @@ static void handle_uart_req(uart_req_msg_u &req_msg)
 
 void uart_task(void *task_params) // Does this *have* to be void * for freeRTOS?
 {
+   uart.out_raw((uint8_t *)"[uart] Starting UART task loop.\r\n", 33, UINT32_MAX); // Doing this as the print library doesn't currently work for this task.
    while(1)
-  {
+   {
       uart_req_msg_u  req_msg  = {};
       uart_resp_msg_u resp_msg = {};
       if (xQueueReceive(uart_resp_queue, &resp_msg, 0) == pdTRUE)
