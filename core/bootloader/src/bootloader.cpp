@@ -292,7 +292,7 @@ int main(void)
    MX_GPIO_Init(); // This needs replacing or fixing, wasn't needed for UART like thought
 
    crc_init();
-   fw_image_init(&crc32_calculate);
+   fw_image_init(&crc32_calculate, &printf);
 
    uart.init();
    printf("Print initialized in bootloader...\r\n");

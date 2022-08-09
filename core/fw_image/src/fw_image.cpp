@@ -24,12 +24,14 @@ namespace
 {
    // local data
    image_info_t image_info = {};
-   uint32_t (*crc32_func_ptr)(uint32_t *buffer, uint32_t length); // Function pointer for calculating CRC
+   uint32_t (*crc32_func)(uint32_t *buffer, uint32_t length); // Function pointer for calculating CRC
+   int (*print_func)(const char *format, ...);
 }
 
-void fw_image_init(uint32_t (*func_ptr)(uint32_t *buffer, uint32_t length))
+void fw_image_init(uint32_t (*crc32_func_ptr)(uint32_t *buffer, uint32_t length), int (*print_func_ptr)(const char *format, ...))
 {
-   crc32_func_ptr = func_ptr;  
+   crc32_func = crc32_func_ptr;
+   print_func = print_func_ptr;
 }
 
 // Validate, relocate/load, and execute
@@ -100,13 +102,13 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
 
       if (error != image_error_e::SUCCESS)
       {
-         printf("Image A validation failed! Falling back on B...\r\n");
+         print_func("Image A validation failed! Falling back on B...\r\n");
          fallback = true; // The image was bad, so we need to fallback on the other image, even though this one was active
       }
 
       if (!fallback)
       {
-         printf("Image A is valid!\r\n");
+         print_func("Image A is valid!\r\n");
          // Assign values to global struct
          image_info.image_src_ptr = reinterpret_cast<uint32_t *>(image_ptr);
          image_info.image_size = header_a->image_size;
@@ -122,7 +124,7 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
 
       if (error != image_error_e::SUCCESS)
       {
-         printf("Image B validation failed!\r\n");
+         print_func("Image B validation failed!\r\n");
          switch(header_b->active)
          {
             case false:
@@ -134,7 +136,7 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
                }
                break;
             case true:
-               printf("Falling back to image A...\r\n");
+               print_func("Falling back to image A...\r\n");
                // Since this image is invalid, we want to fallback to A
                fallback = true;
                break;
@@ -143,7 +145,7 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
       
       if (!fallback)
       {
-         printf("Image B is valid!\r\n");
+         print_func("Image B is valid!\r\n");
          image_info.image_src_ptr = reinterpret_cast<uint32_t *>(header_b);
          image_info.image_size = header_b->image_size;
          image_info.image_dest_ptr = reinterpret_cast<uint32_t *>(header_b->entry_addr);
@@ -159,7 +161,7 @@ static image_error_e find_validate_image(uint32_t *image_ptr)
 
       if (error != image_error_e::SUCCESS)
       {
-         printf("Image A is invalid!\r\n");
+         print_func("Image A is invalid!\r\n");
          return image_error_e::NO_VALID_IMAGES;
       }
 
@@ -213,20 +215,20 @@ image_error_e fw_image_validate(uint8_t *image_header_ptr)
 {
    fw_image_header_t *header = reinterpret_cast<fw_image_header_t *>(image_header_ptr);
 
-   printf("CRC of incoming image in header is: %lx\r\n", header->crc32);
+   print_func("CRC of incoming image in header is: %lx\r\n", header->crc32);
    uint32_t *actual_image_ptr = reinterpret_cast<uint32_t *>(image_header_ptr + sizeof(fw_image_header_t));
    uint32_t actual_image_size = header->image_size - sizeof(fw_image_header_t);
-   uint32_t crc = crc32_func_ptr(actual_image_ptr, actual_image_size);
-   printf("CRC of incoming image calculated as: %lx\r\n", crc);
+   uint32_t crc = crc32_func(actual_image_ptr, actual_image_size);
+   print_func("CRC of incoming image calculated as: %lx\r\n", crc);
 
    if (crc != header->crc32)
    {
-      printf("CRC check failed!\r\n");
+      print_func("CRC check failed!\r\n");
       return image_error_e::INVALID_IMAGE;
    }
    else
    {
-      printf("CRC check passed!\r\n");
+      print_func("CRC check passed!\r\n");
       return image_error_e::SUCCESS;
    }
 }
