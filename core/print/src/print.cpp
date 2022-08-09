@@ -18,6 +18,7 @@ void Print::puts(const char *str)
    while (*str != '\0')
    {
       this->print_accumulate(*str);
+      str++;
    }
 }
 
