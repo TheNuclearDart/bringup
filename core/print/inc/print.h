@@ -1,3 +1,5 @@
+#include <stdarg.h>
+
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
 #include "queue.h"
@@ -17,6 +19,7 @@ class Print
 {
    public:
       int out(const char *format, ...);
+      int vout(const char *format, va_list args);
       void init(QueueHandle_t *out_queue);
       void handle_queue(void);
       Print(const char *task_name);

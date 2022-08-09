@@ -124,11 +124,8 @@ void Print::print_accumulate(const uint8_t &data)
    }
 }
 
-int Print::out(const char *format, ...)
+int Print::vout(const char *format, va_list args)
 {
-   va_list args;
-   va_start(args, format);
-
    int length = 0;
 
    int integer;
@@ -162,8 +159,23 @@ int Print::out(const char *format, ...)
                puts(str);
                length += strlen(str);
                break;
+            case 'l': // Probably not the best method
+               {
+                  format++;
+                  switch(*format)
+                  {
+                     case 'x':
+                        // Hexadecimal
+                        integer = va_arg(args, int);
+                        itoa(integer, str_buffer, 16);
+                        puts(str_buffer);
+                        length += strlen(str_buffer);
+                        break;
+                  }
+               }
+               break;
             case 'x':
-               // Hexadecimal
+               // Hexadecimal. Need to unify this with 'lx'
                integer = va_arg(args, int);
                itoa(integer, str_buffer, 16);
                puts(str_buffer);
@@ -181,6 +193,17 @@ int Print::out(const char *format, ...)
       format++;
    }
    this->print_accumulate('\0'); // Null terminate the string. This is a little different than printf.
+   return length;
+}
+
+int Print::out(const char *format, ...)
+{
+   int length = 0;
+   va_list args;
+   va_start(args, format);
+   length = this->vout(format, args);
+   va_end(args);
+
    return length;
 }
 

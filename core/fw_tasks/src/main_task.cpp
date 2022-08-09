@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -30,8 +31,8 @@ namespace
 QueueHandle_t main_req_queue;
 QueueHandle_t main_resp_queue;
 
-// These need to live in a separate file, not sure where yet, maybe something with print.cpp
-// Also not sure how to use them with a single instance of Print
+// Not sure what to do with this now... not using printf, but _write stil needs it.
+// There's probably a way to stop linking printf
 #ifdef __GNUC__
 #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 #else
@@ -45,6 +46,17 @@ PUTCHAR_PROTOTYPE
    return ch;
 }
 
+int print_wrapper(const char *format, ...)
+{
+   int length = 0;
+   va_list args;
+   va_start(args, format);
+   length = main_print.vout(format, args);
+   va_end(args);
+
+   return length;
+}
+
 void main_task_init(void)
 {
    // Create Queues to other tasks
@@ -55,7 +67,7 @@ void main_task_init(void)
    lcd.init();
 
    crc_init();
-   fw_image_init(&crc32_calculate); // I feel like I need a different solution for this.
+   fw_image_init(&crc32_calculate, &print_wrapper); // I feel like I need a different solution for this.
 
    main_print.init(&uart_req_queue);
 }
