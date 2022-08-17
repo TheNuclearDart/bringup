@@ -5,11 +5,12 @@ set(LINKER_FILE "${CMAKE_SOURCE_DIR}/core/memory_layout/bl_memory_layout.ld")
 message(STATUS "Linker Script for ${TARGET}: ${LINKER_FILE}")
 message("CMake Linker Flags: ${CMAKE_EXE_LINKER_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "-lc -lm -lnosys -specs=nano.specs -L${CMAKE_SOURCE_DIR}/core/memory_layout/ -T${LINKER_FILE} -Wl,-Map=${CMAKE_SOURCE_DIR}/build/bl_memory_map.map,--cref -Wl,--gc-sections")
-add_compile_definitions(STM32F746xx USE_HAL_DRIVER USE_FULL_ASSERT BOOTLOADER_BUILD) # needed?
+add_compile_definitions(STM32F746xx USE_HAL_DRIVER USE_FULL_ASSERT BOOTLOADER_BUILD SDRAM_TEST) # needed?
 
 set(SRC
    ${CMAKE_SOURCE_DIR}/core/bootloader/src/bl_startup.s
    ${CMAKE_SOURCE_DIR}/core/bootloader/src/bootloader.cpp
+   ${CMAKE_SOURCE_DIR}/core/bootloader/src/sdram_init.cpp
    ${CMAKE_SOURCE_DIR}/core/syscalls.c
    ${CMAKE_SOURCE_DIR}/core/stm32f7xx_hal_msp.c
    ${CMAKE_SOURCE_DIR}/core/stm32f7xx_hal_timebase_tim.c
@@ -22,13 +23,16 @@ set(SRC
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.c
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.c
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.c
+   ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sdram.c
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.c
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.c
+   ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_fmc.c
 )
 add_executable(${TARGET} ${SRC})
 
 # Includes
 target_include_directories(${TARGET} PUBLIC
+   ${CMAKE_CURRENT_LIST_DIR}/inc
    ${CMAKE_SOURCE_DIR}/core/
    ${CMAKE_SOURCE_DIR}/core/board_defines/inc
    ${CMAKE_SOURCE_DIR}/core/interrupts/inc
