@@ -25,11 +25,6 @@
 // File local variables
 namespace
 {
-   // Need to decouple this more from the HAL
-   //UART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, 1000);
-   //LCD lcd;
-   //uint8_t fw_image_buffer[0x10000]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
-   //USB_Host usb;
 }
 
 // Taken from cubemx generated code. Should try to understand.
@@ -56,7 +51,7 @@ void SystemClock_Config(void)
    RCC_OscInitStruct.PLL.PLLM = 25;
    RCC_OscInitStruct.PLL.PLLN = 400;
    RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-   RCC_OscInitStruct.PLL.PLLQ = 9;
+   RCC_OscInitStruct.PLL.PLLQ = 8;
    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
    {
       assert_param(0);
@@ -290,7 +285,7 @@ static void MX_GPIO_Init(void)
 ITCM_CODE int main(void)
 {
    HAL_Init(); // Init ST Provided HAL
-   SystemClock_Config(); // Initialize system clocks
+   SystemClock_Config(); // Initialize system clocks, why does this need to be done a second time?
    MX_GPIO_Init(); // This needs replacing or fixing, wasn't needed for UART like thought
 
    // DOne in main task for now. uart.init(); // Because of this, printf is likely not going to work in other tasks, until we get uart as its own thing

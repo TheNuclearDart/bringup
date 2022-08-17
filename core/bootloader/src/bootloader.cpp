@@ -11,6 +11,8 @@
 #include "crc.h"
 #include "fw_image.h"
 #include "gpio_defines.h"
+#include "memory_layout.h"
+#include "sdram_init.h"
 #include "uart.h"
 
 // File local variables
@@ -44,9 +46,9 @@ PUTCHAR_PROTOTYPE
 // Taken from cubemx generated code. Should try to understand.
 void SystemClock_Config(void)
 {
-   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-   RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+   RCC_OscInitTypeDef RCC_OscInitStruct = {};
+   RCC_ClkInitTypeDef RCC_ClkInitStruct = {};
+   RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {};
 
    /** Configure LSE Drive Capability 
     */
@@ -65,7 +67,7 @@ void SystemClock_Config(void)
    RCC_OscInitStruct.PLL.PLLM = 25;
    RCC_OscInitStruct.PLL.PLLN = 400;
    RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-   RCC_OscInitStruct.PLL.PLLQ = 9;
+   RCC_OscInitStruct.PLL.PLLQ = 8;
    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
    {
       assert_param(0);
@@ -282,7 +284,25 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(ARDUINO_SCK_D13_GPIO_Port, &GPIO_InitStruct);
+}
 
+static void ram_test(void)
+{
+   uint32_t *ram_start = &__sdram_start__;
+   uint32_t ram_size  = reinterpret_cast<uint32_t>(&__sdram_size__);
+
+   uint32_t write_val = 0xA5A5A5A5;
+
+   // Write out value, read back and assert if not matching
+   for (uint32_t i = 0; i < ram_size / 4; i++)
+   {
+      *ram_start = write_val;
+      if (*ram_start != write_val)
+      {
+         assert_param(0);
+      }
+      ram_start++;
+   }
 }
 
 int main(void)
@@ -297,7 +317,23 @@ int main(void)
    uart.init();
    printf("Print initialized in bootloader...\r\n");
 
+   if (sdram_init() != RamError::SUCCESS)
+   {
+      assert_param(0);
+   }
+
+   printf("SDRAM Initialized...\r\n");
+
+   if (SDRAM_TEST)
+   {
+      printf("Starting SDRAM test...\r\n");
+      ram_test();
+      printf("SDRAM test passed!\r\n");
+   }
+
    printf("Bootloader init complete, looking for main image...\r\n");
+
+   printf("System Clock set to: %ld\r\n", HAL_RCC_GetSysClockFreq());
    
    // Jump to image.
    image_error_e error = fw_image_load();

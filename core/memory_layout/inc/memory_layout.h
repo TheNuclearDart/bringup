@@ -12,6 +12,8 @@
 
 extern uint32_t __app_start__;
 extern uint32_t __app_size__;
+extern uint32_t __sdram_start__;
+extern uint32_t __sdram_size__; // Hardfault when accessing this?
 extern uint32_t __sram_start__;
 extern uint32_t __shared_data_start__;
 extern uint32_t __shared_data_end__;
