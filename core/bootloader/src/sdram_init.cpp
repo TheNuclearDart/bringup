@@ -27,10 +27,10 @@ namespace
    FMC_SDRAM_TimingTypeDef sdram_timing =
    {
       .LoadToActiveDelay    = 2,
-      .ExitSelfRefreshDelay = 7,
+      .ExitSelfRefreshDelay = 6,
       .SelfRefreshTime      = 4,
-      .RowCycleDelay        = 7,
-      .WriteRecoveryTime    = 3,
+      .RowCycleDelay        = 6,
+      .WriteRecoveryTime    = 2,
       .RPDelay              = 2,
       .RCDDelay             = 2
    };
