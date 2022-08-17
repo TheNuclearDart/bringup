@@ -23,6 +23,8 @@ SECTIONS
       . = ALIGN(4);
       *(.itcm_code)
       *(.itcm_code*)
+      *(.itcm_data)
+      *(.itcm_data*)
       . = ALIGN(4);
    } > ITCM
 
@@ -31,7 +33,9 @@ SECTIONS
    {
       . = ALIGN(4);
       *(.dtcm_code)
-      *(.dtcm_code*);
+      *(.dtcm_code*)
+      *(.dtcm_data)
+      *(.dtcm_data*)
       . = ALIGN(4);
    } > DTCM
 
@@ -50,13 +54,15 @@ SECTIONS
       . = ALIGN(128);
       KEEP(*(.isr_vector))
       . = ALIGN(128);
-   } > SRAM
+   } > SDRAM
 
    .sram_code :
    {
       . = ALIGN(4);
       *(.sram_code)
       *(.sram_code*)
+      *(.sram_data)
+      *(.sram_data*)
       . = ALIGN(4);
    } > SRAM
 
@@ -74,7 +80,7 @@ SECTIONS
 
       . = ALIGN(4);
       _etext = .;
-   } > SRAM
+   } > SDRAM
 
    .rodata :
    {
@@ -82,19 +88,19 @@ SECTIONS
       *(.rodata) /* All constant data goes in flash */
       *(.roadata*)
       . = ALIGN(4);
-   } > SRAM
+   } > SDRAM
 
    .ARM.extab : 
    { 
       *(.ARM.extab* .gnu.linkonce.armextab.*) 
-   } > SRAM
+   } > SDRAM
   
   .ARM : 
   {
       __exidx_start = .;
       *(.ARM.exidx*)
       __exidx_end = .;
-  } > SRAM
+  } > SDRAM
 
   /* These are things I need to understand */
   .preinit_array :
@@ -102,7 +108,7 @@ SECTIONS
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
-  } > SRAM
+  } > SDRAM
   
   .init_array :
   {
@@ -110,7 +116,7 @@ SECTIONS
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
-  } > SRAM
+  } > SDRAM
   
   .fini_array :
   {
@@ -118,7 +124,7 @@ SECTIONS
     KEEP (*(SORT(.fini_array.*)))
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
-  } > SRAM
+  } > SDRAM
 
    _sidata = LOADADDR(.data); /* Expose the load address (RAM address) for .data */
    .data :
@@ -129,7 +135,7 @@ SECTIONS
       *(.data*)
       . = ALIGN(4);
       _edata = .;
-   } > SRAM
+   } > SDRAM
 
    .bss (NOLOAD) :
    {
@@ -140,7 +146,7 @@ SECTIONS
       *(COMMON)
       . = ALIGN(4);
       _ebss = .;
-   } > SRAM
+   } > SDRAM
 
    /* The stack must be the last RAM rule (I think) */
    .stack (NOLOAD) :
@@ -151,7 +157,7 @@ SECTIONS
       . = . + _min_stack_size;
       . = ALIGN(8);
       _estack = .;
-   } > SRAM
+   } > SDRAM
 
    /* Remove information from the standard libraries */
   /DISCARD/ :
