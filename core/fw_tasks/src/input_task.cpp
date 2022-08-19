@@ -7,21 +7,26 @@
 // For messaging
 #include "main_task_msgs.h"
 
+namespace input_queues
+{
+   QueueHandle_t req;
+   QueueHandle_t resp;
+}
+
 namespace
 {
    Print input_print("input");
 }
 
-QueueHandle_t input_req_queue;
-QueueHandle_t input_resp_queue;
-
 void input_task_init(void)
 {
-   // Create Queues to other tasks
-   input_req_queue  = xQueueCreate(1, MAX_MSG_SIZE); // One message queue (for now), size of 128 bytes. These should be defined.
-   input_resp_queue = xQueueCreate(1, MAX_MSG_SIZE);
+   using namespace input_queues;
 
-   input_print.init(&uart_req_queue);
+   // Create Queues to other tasks
+   req  = xQueueCreate(1, MAX_MSG_SIZE); // One message queue (for now), size of 128 bytes. These should be defined.
+   resp = xQueueCreate(1, MAX_MSG_SIZE);
+
+   input_print.init(&uart_queues::req);
 }
 
 static void handle_input(void)
@@ -32,7 +37,7 @@ static void handle_input(void)
    input_notification.hdr.resp_queue = nullptr;
    input_notification.input          = InputType::BLUE_BUTTON;
 
-   xQueueSend(main_req_queue, &input_notification, 0); // Returns if successful, I don't think we need to bother with that for now.
+   xQueueSend(main_queues::req, &input_notification, 0); // Returns if successful, I don't think we need to bother with that for now.
 }
 
 void input_task(void *task_params) // Does this *have* to be void * for freeRTOS?
@@ -49,11 +54,11 @@ void input_task(void *task_params) // Does this *have* to be void * for freeRTOS
          // Basic delay to debounce. Need a better option.
          HAL_Delay(500);
       }
-      //if (xQueueReceive(input_resp_queue, &msg, 0) == pdTRUE)
+      //if (xQueueReceive(resp, &msg, 0) == pdTRUE)
       //{
          /* Handle msg */
       //}
-      //if (xQueueReceive(input_req_queue, &msg, 0) == pdTRUE)
+      //if (xQueueReceive(req, &msg, 0) == pdTRUE)
       //{
       //   /* Handle req messages */
       //}

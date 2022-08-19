@@ -4,6 +4,7 @@ message(STATUS "Building ${TARGET} library")
 set(SRC
    ${CMAKE_CURRENT_LIST_DIR}/src/main_task.cpp
    ${CMAKE_CURRENT_LIST_DIR}/src/input_task.cpp
+   ${CMAKE_CURRENT_LIST_DIR}/src/lcd_task.cpp
    ${CMAKE_CURRENT_LIST_DIR}/src/uart_task.cpp
 )
 add_library(${TARGET} ${SRC})
