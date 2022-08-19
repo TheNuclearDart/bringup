@@ -18,13 +18,21 @@ SECTIONS
    } > SRAM */
 
    /* ITCM Sections */
+   .isr_vector :
+   {
+      . = ALIGN(128);
+      KEEP(*(.isr_vector))
+      . = ALIGN(128);
+   } > ITCM
+
    .itcm_code :
    {
       . = ALIGN(4);
+      *(.text.reset_handler)
+      *(.text.default_handler)
+      *(.text.HardFault_Handler)
       *(.itcm_code)
       *(.itcm_code*)
-      *(.itcm_data)
-      *(.itcm_data*)
       . = ALIGN(4);
    } > ITCM
 
@@ -48,13 +56,6 @@ SECTIONS
       . = ALIGN(4);
       __shared_data_end__ = .;
    } > SRAM
-
-   .isr_vector :
-   {
-      . = ALIGN(128);
-      KEEP(*(.isr_vector))
-      . = ALIGN(128);
-   } > SDRAM
 
    .sram_code :
    {
@@ -148,6 +149,17 @@ SECTIONS
       _ebss = .;
    } > SDRAM
 
+   .frame_buffer (NOLOAD) :
+   {
+      . = ALIGN(4);
+      _sfbuffer = .;
+      . = . + 0x80000;
+      *(.frame_buffer)
+      *(.frame_buffer*)
+      . = ALIGN(4);
+      _efbuffer = .;
+   } > SDRAM
+
    /* The stack must be the last RAM rule (I think) */
    .stack (NOLOAD) :
    {
@@ -157,7 +169,7 @@ SECTIONS
       . = . + _min_stack_size;
       . = ALIGN(8);
       _estack = .;
-   } > SDRAM
+   } > SRAM
 
    /* Remove information from the standard libraries */
   /DISCARD/ :

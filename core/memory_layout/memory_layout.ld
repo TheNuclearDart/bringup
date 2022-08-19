@@ -11,11 +11,6 @@ MEMORY
    BL_FLASH  (xr)  : ORIGIN = 0x08000000, LENGTH = 64K  /* This is the region defined for the bootloader in flash. This is the first image loaded. */
    APP_FLASH (xr)  : ORIGIN = 0x08010000, LENGTH = 240K /* Make this 0x70000 when we can support it(448KB... weird, probably bad size). Rignt now the entire image is in SRAM, so it needs to match that size! */
    SDRAM     (xrw) : ORIGIN = 0xC0000000, LENGTH = 8M  /* I believe this is correct, that the SDRAM is only 64Mbit (8Mbyte!!), and connected to FMC SDRAM bank 1 */
-   /* APP_FLASH(xr) : ORIGIN = ?, LENGTH = ?  This is the entire application image region. Both will live here. */
-                                             /* Eventually, this will just be used to map out the region it gets stored, */
-                                             /* but actually writing here will be handled by fwupdate
-
-   /* Needs external RAM (if it exists on the board? 5-11-22 it does, but it needs to be added) */
 }
 
 __sdram_start__ = ORIGIN(SDRAM);

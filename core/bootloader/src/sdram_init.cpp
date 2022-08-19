@@ -15,7 +15,7 @@ namespace
          .RowBitsNumber      = FMC_SDRAM_ROW_BITS_NUM_12,
          .MemoryDataWidth    = FMC_SDRAM_MEM_BUS_WIDTH_16, // This probably isn't right, need to check
          .InternalBankNumber = FMC_SDRAM_INTERN_BANKS_NUM_2,
-         .CASLatency         = FMC_SDRAM_CAS_LATENCY_2, // Might need to be 2
+         .CASLatency         = FMC_SDRAM_CAS_LATENCY_3, // Might need to be 2
          .WriteProtection    = FMC_SDRAM_WRITE_PROTECTION_DISABLE, // ??
          .SDClockPeriod      = FMC_SDRAM_CLOCK_PERIOD_2, // Also wrong?? This is a pain in my ass, truly.
          .ReadBurst          = FMC_SDRAM_RBURST_ENABLE,  // I believe this chip supports this
@@ -88,7 +88,7 @@ static void BSP_SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_S
   /* Step 7: Program the external memory mode register */
   tmpmrd = (uint32_t)SDRAM_MODEREG_BURST_LENGTH_1          |
                      SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL   |
-                     SDRAM_MODEREG_CAS_LATENCY_2           |
+                     SDRAM_MODEREG_CAS_LATENCY_3           |
                      SDRAM_MODEREG_OPERATING_MODE_STANDARD |
                      SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
 

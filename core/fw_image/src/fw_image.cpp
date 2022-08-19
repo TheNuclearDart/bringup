@@ -192,7 +192,7 @@ void fw_image_execute(void)
    // Set vector table register to use Application's vector table
    __disable_irq();
    SCB->VTOR = (reinterpret_cast<uint32_t>(new_ptr));
-   __enable_irq();
+   //__enable_irq();
 
    // Set function pointer to point to second full word, which is the application reset_handler
    uint32_t *new_app_start_ptr = reinterpret_cast<uint32_t *>(new_ptr); // Cast back to a uint32_t pointer
