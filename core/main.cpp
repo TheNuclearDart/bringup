@@ -309,11 +309,13 @@ ITCM_CODE int main(void)
    // Initialize the tasks using their init functions _BEFORE_ starting the scheduler
    main_task_init();
    input_task_init();
+   lcd_task_init();
    uart_task_init();
 
    // Create the tasks. Would be better using an array of them or something
    xTaskCreate(main_task, "main", 0x400, NULL, tskIDLE_PRIORITY + 1, NULL);
    xTaskCreate(input_task, "input", 0x800, NULL, tskIDLE_PRIORITY + 1, NULL);
+   xTaskCreate(lcd_task, "lcd", 0x800, NULL, tskIDLE_PRIORITY + 1, NULL); // Stack will likely need to be bumped up
    xTaskCreate(uart_task, "uart", 0x400, NULL, tskIDLE_PRIORITY + 1, NULL);
 
    vTaskStartScheduler();

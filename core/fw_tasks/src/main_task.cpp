@@ -7,7 +7,6 @@
 #include "fw_image.h"
 #include "fw_tasks.h"
 #include "fw_update.h"
-#include "lcd.h"
 #include "print.h"
 #include "queue.h"
 #include "syscalls.h"
@@ -27,7 +26,6 @@ namespace
 {
    // Need to decouple this more from the HAL
    // moving to UART taskUART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, 1000);
-   LCD lcd;
    uint8_t fw_image_buffer[0x10000]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
    generic_task_ctx_t uart_ctx;
    Print main_print("main");
@@ -69,31 +67,6 @@ void main_task_init(void)
    resp = xQueueCreate(1, MAX_MSG_SIZE);
    
    //uart.init();
-   lcd.init();
-
-   LTDC_LayerCfgTypeDef layer_cfg = 
-   {
-      .WindowX0 = 0,
-      .WindowX1 = 480,
-      .WindowY0 = 0,
-      .WindowY1 = 272,
-      .PixelFormat = LTDC_PIXEL_FORMAT_RGB565,
-      .Alpha = 255,
-      .Alpha0 = 0,
-      .BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA,
-      .BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA,
-      .FBStartAdress = reinterpret_cast<uint32_t>(&_sfbuffer),
-      .ImageWidth = 480,
-      .ImageHeight = 272,
-      .Backcolor =
-      {
-         .Blue = 0,
-         .Green = 0,
-         .Red = 0
-      }
-   };
-
-   lcd.config_layer(&layer_cfg);
 
    crc_init();
    fw_image_init(&crc32_calculate, &print_wrapper); // I feel like I need a different solution for this.
@@ -198,7 +171,7 @@ void main_task(void *task_params)
 
    main_print.out("Starting main task loop.\r\n");
 
-   while(1)
+   while (1)
    {
       main_req_msg_u     req_msg  = {};
       generic_resp_msg_t resp_msg = {};

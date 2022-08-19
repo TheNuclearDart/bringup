@@ -43,7 +43,7 @@ static void handle_input(void)
 void input_task(void *task_params) // Does this *have* to be void * for freeRTOS?
 {
    input_print.out("Starting input task loop.\r\n");
-   while(1)
+   while (1)
    {
       input_print.handle_queue();
       // This needs some work to prevent it from sending endless messages??
