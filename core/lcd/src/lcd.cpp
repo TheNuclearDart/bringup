@@ -51,32 +51,13 @@ void LCD::init(void)
       {
          assert_msg(0, "Error in HAL_LTDC_Init!\r\n");
       }
-
-      LTDC_LayerCfgTypeDef layerCfg = 
-      {
-         .WindowX0 = 0,
-         .WindowX1 = 480,
-         .WindowY0 = 0,
-         .WindowY1 = 272,
-         .PixelFormat = LTDC_PIXEL_FORMAT_RGB565,
-         .Alpha = 255,
-         .Alpha0 = 0,
-         .BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA,
-         .BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA,
-         .FBStartAdress = 0xC0000000,
-         .ImageWidth = 480,
-         .ImageHeight = 272,
-         .Backcolor =
-         {
-            .Blue = 0,
-            .Green = 0,
-            .Red = 0
-         }
-      };
-      if (HAL_LTDC_ConfigLayer(&this->ltdcInstance, &layerCfg, 0) != HAL_OK)
-      {
-         assert_msg(0, "Error in HAL_LTDC_ConfigLayer!\r\n");
-      }
    }
 }
 
+void LCD::config_layer(LTDC_LayerCfgTypeDef *layer_cfg)
+{
+   if (HAL_LTDC_ConfigLayer(&this->ltdcInstance, layer_cfg, 0) != HAL_OK)
+   {
+      assert_param(0);
+   }
+}

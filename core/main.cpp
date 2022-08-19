@@ -287,7 +287,7 @@ ITCM_CODE int main(void)
    HAL_Init(); // Init ST Provided HAL
    SystemClock_Config(); // Initialize system clocks, why does this need to be done a second time?
    MX_GPIO_Init(); // This needs replacing or fixing, wasn't needed for UART like thought
-
+   __enable_irq();
    // DOne in main task for now. uart.init(); // Because of this, printf is likely not going to work in other tasks, until we get uart as its own thing
    //printf("Print initialized in main app!\r\n");
    //printf("FW Version: %lx\r\nCRC: %lx\r\n", shared_data_get_active_fw_header()->fw_version, shared_data_get_active_fw_header()->crc32);
@@ -318,37 +318,11 @@ ITCM_CODE int main(void)
 
    vTaskStartScheduler();
 
+   assert_param(0);
+
    while (1)
    {
-      /* Should never reach with OS */
-      // All of this should be in its own thread once we have the OS??
-      /*GPIO_PinState read_val = HAL_GPIO_ReadPin(USER_PUSH_BUTTON_PORT, USER_PUSH_BUTTON_PIN);
-      if (read_val == GPIO_PIN_SET)
-      {
-         printf("FW Update Process Triggered.\r\n");
-         // This is broken and i don't know why, main image doesn't boot with these uncommented.
-         UART::error error = uart.xmodem_receive(fw_image_buffer, 0x10000);
-         HAL_Delay(1000); // Temporary
-         if (error == UART::error::TIMEOUT)
-         {
-            printf("XModem timed out!\r\n");
-         }
-         else if (error == UART::error::OKAY)
-         {
-            printf("Image downloaded successfully! Writing image to destination in flash...\r\n");
-         }
-         fw_update_error_e update_error = fw_update(fw_image_buffer);
-         if (update_error != fw_update_error_e::SUCCESS)
-         {
-            printf("FW Update failed!\r\n");
-         }
-         else
-         {
-            printf("FW Update succeeded! Resetting Device...\r\n");
-            NVIC_SystemReset();
-         }
-      }
-      //usb.process();*/
+      // Should be unreachable
    }
 
    return 1;
