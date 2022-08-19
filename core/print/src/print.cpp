@@ -79,7 +79,7 @@ void Print::handle_queue(void)
       {
          while (this->print_queue.head_idx != this->print_queue.tail_idx)
          {
-            xQueueSend(uart_req_queue, &this->print_queue.queued_reqs[this->print_queue.tail_idx], UINT32_MAX);
+            xQueueSend(uart_queues::req, &this->print_queue.queued_reqs[this->print_queue.tail_idx], UINT32_MAX);
             if (this->print_queue.tail_idx < (PRINT_QUEUE_SIZE - 1))
             {
                this->print_queue.tail_idx++;
@@ -123,7 +123,7 @@ void Print::print_accumulate(const uint8_t &data)
          // This instance is the one printing, so send to UART
          if (this->print_in_progress)
          {
-            xQueueSend(uart_req_queue, &print_req, UINT32_MAX);
+            xQueueSend(uart_queues::req, &print_req, UINT32_MAX);
             this->print_buffer_bytes = 0;
          }
          // This instance _isn't_ the one printing, so add to this instance's internal queue.

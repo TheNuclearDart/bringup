@@ -17,6 +17,12 @@
 #include "main_task_msgs.h"
 #include "uart_task_msgs.h"
 
+namespace main_queues
+{
+   QueueHandle_t req;
+   QueueHandle_t resp;
+}
+
 namespace
 {
    // Need to decouple this more from the HAL
@@ -27,9 +33,6 @@ namespace
    Print main_print("main");
    //USB_Host usb;
 }
-
-QueueHandle_t main_req_queue;
-QueueHandle_t main_resp_queue;
 
 // Not sure what to do with this now... not using printf, but _write stil needs it.
 // There's probably a way to stop linking printf
@@ -59,9 +62,11 @@ int print_wrapper(const char *format, ...)
 
 void main_task_init(void)
 {
+   using namespace main_queues;
+
    // Create Queues to other tasks
-   main_req_queue  = xQueueCreate(1, MAX_MSG_SIZE); // One message queue (for now), size of 128 bytes. These should be defined.
-   main_resp_queue = xQueueCreate(1, MAX_MSG_SIZE);
+   req  = xQueueCreate(1, MAX_MSG_SIZE); // One message queue (for now), size of 128 bytes. These should be defined.
+   resp = xQueueCreate(1, MAX_MSG_SIZE);
    
    //uart.init();
    lcd.init();
@@ -93,7 +98,7 @@ void main_task_init(void)
    crc_init();
    fw_image_init(&crc32_calculate, &print_wrapper); // I feel like I need a different solution for this.
 
-   main_print.init(&uart_req_queue);
+   main_print.init(&uart_queues::req);
 }
 
 /* Message processing will likely be moved into its own file someday */
@@ -104,6 +109,8 @@ void main_task_init(void)
  */
 void handle_input_notification(input_notification_msg_t &input_notification)
 {
+   using namespace main_queues;
+
    // Check the input and take action
    switch(input_notification.input)
    {
@@ -118,9 +125,9 @@ void handle_input_notification(input_notification_msg_t &input_notification)
             xmodem_req.buffer_size    = 0x10000;
             xmodem_req.hdr.opcode     = static_cast<uint32_t>(UartOpcode::XMODEM_RECEIVE);
             xmodem_req.hdr.ctx        = &uart_ctx;
-            xmodem_req.hdr.resp_queue = &main_resp_queue;
+            xmodem_req.hdr.resp_queue = &resp;
 
-            xQueueSend(uart_req_queue, &xmodem_req, UINT32_MAX);
+            xQueueSend(uart_queues::req, &xmodem_req, UINT32_MAX);
          }
          break;
       case InputType::UNDEFINED:
@@ -187,6 +194,8 @@ void handle_resp(generic_resp_msg_t &resp_msg)
 
 void main_task(void *task_params)
 {
+   using namespace main_queues;
+
    main_print.out("Starting main task loop.\r\n");
 
    while(1)
@@ -196,11 +205,11 @@ void main_task(void *task_params)
 
       main_print.handle_queue();
 
-      if (xQueueReceive(main_resp_queue, &resp_msg, 0) == pdTRUE)
+      if (xQueueReceive(resp, &resp_msg, 0) == pdTRUE)
       {
          handle_resp(resp_msg);
       }
-      if (xQueueReceive(main_req_queue, &req_msg, 0) == pdTRUE)
+      if (xQueueReceive(req, &req_msg, 0) == pdTRUE)
       {
          /* Handle req messages */
          handle_request(req_msg);
