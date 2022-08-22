@@ -1,5 +1,5 @@
 set(TARGET lcd)
-message(STATUS "Building ${TARGET} library")
+
 set(SRC
    ${CMAKE_CURRENT_LIST_DIR}/src/lcd.cpp
    ${CMAKE_SOURCE_DIR}/drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_ltdc.c

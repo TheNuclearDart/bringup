@@ -1,5 +1,4 @@
 set(TARGET crc)
-message(STATUS "Building ${TARGET} library")
 
 set(SRC
    ${CMAKE_CURRENT_LIST_DIR}/src/crc.cpp

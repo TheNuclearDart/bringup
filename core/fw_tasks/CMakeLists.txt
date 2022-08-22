@@ -1,5 +1,4 @@
 set(TARGET fw_tasks)
-message(STATUS "Building ${TARGET} library")
 
 set(SRC
    ${CMAKE_CURRENT_LIST_DIR}/src/main_task.cpp

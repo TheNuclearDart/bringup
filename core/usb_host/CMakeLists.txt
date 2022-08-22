@@ -1,5 +1,5 @@
 set(TARGET usb_host)
-message(STATUS "Building ${TARGET} library")
+
 set(SRC
    ${CMAKE_CURRENT_LIST_DIR}/src/usbh_conf.c
    ${CMAKE_CURRENT_LIST_DIR}/src/usbh_platform.c

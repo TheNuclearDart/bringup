@@ -1,5 +1,4 @@
 set(TARGET bootloader)
-message(STATUS "Building ${TARGET}")
 
 set(LINKER_FILE "${CMAKE_SOURCE_DIR}/core/memory_layout/bl_memory_layout.ld")
 message(STATUS "Linker Script for ${TARGET}: ${LINKER_FILE}")

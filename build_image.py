@@ -44,7 +44,7 @@ with open(args.sections_path) as sections:
 
 with open(args.sections_path) as sections:
    section_dict = [{}] * int((num_lines / 2))
-   print('Number of sections is ' + str(num_lines))
+   print('Number of sections is ' + str(num_lines / 2))
    for x in range(5):
       next(sections)
    index = 0

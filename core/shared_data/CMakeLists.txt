@@ -1,5 +1,4 @@
 set(TARGET shared_data)
-message(STATUS "Building ${TARGET} library")
 
 set(SRC
    ${CMAKE_CURRENT_LIST_DIR}/src/shared_data.cpp

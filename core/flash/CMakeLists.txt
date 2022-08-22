@@ -1,5 +1,4 @@
 set(TARGET flash)
-message(STATUS "Building ${TARGET} library")
 
 set(SRC
    ${CMAKE_CURRENT_LIST_DIR}/src/flash.cpp
