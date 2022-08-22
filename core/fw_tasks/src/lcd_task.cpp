@@ -61,7 +61,7 @@ void lcd_task(void *task_params)
 {
    using namespace lcd_queues;
 
-   lcd_print.out("Starting lcd task loop...\r\n");
+   lcd_print.out("Starting lcd task loop.\r\n");
 
    while(1)
    {
