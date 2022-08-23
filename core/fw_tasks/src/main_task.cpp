@@ -22,7 +22,7 @@ namespace
    // Need to decouple this more from the HAL
    // moving to UART taskUART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, 1000);
    LCD lcd;
-   uint8_t fw_image_buffer[0x10000]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
+   uint8_t fw_image_buffer[fw_image_size]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
    generic_task_ctx_t uart_ctx;
    Print main_print("main");
    //USB_Host usb;

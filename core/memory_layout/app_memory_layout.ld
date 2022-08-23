@@ -57,6 +57,16 @@ SECTIONS
       __shared_data_end__ = .;
    } > SRAM
 
+   .frame_buffer (NOLOAD) :
+   {
+      . = ALIGN(4);
+      _sfbuffer = .;
+      *(.frame_buffer)
+      *(.frame_buffer*)
+      . = ALIGN(4);
+      _efbuffer = .;
+   } > SRAM
+
    .sram_code :
    {
       . = ALIGN(4);
@@ -147,17 +157,6 @@ SECTIONS
       *(COMMON)
       . = ALIGN(4);
       _ebss = .;
-   } > SDRAM
-
-   .frame_buffer (NOLOAD) :
-   {
-      . = ALIGN(4);
-      _sfbuffer = .;
-      . = . + 0x80000;
-      *(.frame_buffer)
-      *(.frame_buffer*)
-      . = ALIGN(4);
-      _efbuffer = .;
    } > SDRAM
 
    /* The stack must be the last RAM rule (I think) */

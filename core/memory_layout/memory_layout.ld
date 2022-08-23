@@ -9,7 +9,7 @@ MEMORY
    DTCM      (xrw) : ORIGIN = 0x20000000, LENGTH = 64K
    SRAM      (xrw) : ORIGIN = 0x20010000, LENGTH = 240K /* Should this be bigger? */
    BL_FLASH  (xr)  : ORIGIN = 0x08000000, LENGTH = 64K  /* This is the region defined for the bootloader in flash. This is the first image loaded. */
-   APP_FLASH (xr)  : ORIGIN = 0x08010000, LENGTH = 240K /* Make this 0x70000 when we can support it(448KB... weird, probably bad size). Rignt now the entire image is in SRAM, so it needs to match that size! */
+   APP_FLASH (xr)  : ORIGIN = 0x08010000, LENGTH = 448K /* Make this 0x70000 when we can support it(448KB... weird, probably bad size). Rignt now the entire image is in SRAM, so it needs to match that size! */
    SDRAM     (xrw) : ORIGIN = 0xC0000000, LENGTH = 8M  /* I believe this is correct, that the SDRAM is only 64Mbit (8Mbyte!!), and connected to FMC SDRAM bank 1 */
 }
 

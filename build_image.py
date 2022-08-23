@@ -104,6 +104,8 @@ fw_header_size = ctypes.sizeof(FwHeader)
 
 bin_size = os.path.getsize(app_image_path)
 print("Binary size: " + str(hex(bin_size)))
+if bin_size > 0x70000: #This value should come from somewhere else for ease
+   raise ValueError("Binary is too large!")
 
 binary = open(app_image_path, "rb+") # make this more generic
 
