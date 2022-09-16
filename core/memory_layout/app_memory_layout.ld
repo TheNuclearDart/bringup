@@ -67,6 +67,14 @@ SECTIONS
       . = ALIGN(4);
    } > SRAM
 
+   .freertos_heap (NOLOAD) :
+   {
+      . = ALIGN(4);
+      *(.freertos_heap)
+      *(.freertos_heap*)
+      . = ALIGN(4);
+   } > SRAM
+
    .text :
    {
       . = ALIGN(4);
@@ -165,8 +173,8 @@ SECTIONS
    {
       . = ALIGN(8);
       end = .;
-      . = . + _min_heap_size;
-      . = . + _min_stack_size;
+      . = . + _min_app_heap_size;
+      . = . + _min_app_stack_size;
       . = ALIGN(8);
       _estack = .;
    } > SRAM

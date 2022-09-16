@@ -315,7 +315,7 @@ ITCM_CODE int main(void)
    // Create the tasks. Would be better using an array of them or something
    xTaskCreate(main_task, "main", 0x400, NULL, tskIDLE_PRIORITY + 1, NULL);
    xTaskCreate(input_task, "input", 0x800, NULL, tskIDLE_PRIORITY + 1, NULL);
-   xTaskCreate(lcd_task, "lcd", 0x800, NULL, tskIDLE_PRIORITY + 1, NULL); // Stack will likely need to be bumped up
+   xTaskCreate(lcd_task, "lcd", 0x800, NULL, tskIDLE_PRIORITY + 2, NULL); // Stack will likely need to be bumped up
    xTaskCreate(uart_task, "uart", 0x400, NULL, tskIDLE_PRIORITY + 1, NULL);
 
    vTaskStartScheduler();
@@ -328,4 +328,4 @@ ITCM_CODE int main(void)
    }
 
    return 1;
-}           
+}

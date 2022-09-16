@@ -88,10 +88,15 @@ void uart_task(void *task_params) // Does this *have* to be void * for freeRTOS?
    using namespace uart_queues;
 
    uart.out_raw((uint8_t *)"[uart] Starting UART task loop.\r\n", 33, UINT32_MAX); // Doing this as the print library doesn't currently work for this task.
+
+   uart_req_msg_u     req_msg = {};
+   generic_resp_msg_t resp_msg = {};
+
    while (1)
    {
-      uart_req_msg_u  req_msg  = {};
-      uart_resp_msg_u resp_msg = {};
+      req_msg  = {};
+      resp_msg = {};
+
       if (xQueueReceive(resp, &resp_msg, 0) == pdTRUE)
       {
          /* Handle msg */

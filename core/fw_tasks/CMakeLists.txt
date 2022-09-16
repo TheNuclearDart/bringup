@@ -27,5 +27,7 @@ target_include_directories(${TARGET} PUBLIC
    # FreeRTOS
    ${CMAKE_SOURCE_DIR}/third_party/FreeRTOS/Source/include
    ${CMAKE_SOURCE_DIR}/third_party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1
+   # LVGL
+   ${CMAKE_SOURCE_DIR}/third_party/lvgl
 )
 target_link_libraries(${TARGET} assert crc lcd uart fw_image fw_update print)

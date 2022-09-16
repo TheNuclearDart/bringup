@@ -26,7 +26,7 @@ namespace
 {
    // Need to decouple this more from the HAL
    // moving to UART taskUART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, 1000);
-   uint8_t fw_image_buffer[0x10000]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
+   uint8_t fw_image_buffer[0x70000]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
    generic_task_ctx_t uart_ctx;
    Print main_print("main");
    //USB_Host usb;
@@ -95,7 +95,7 @@ void handle_input_notification(input_notification_msg_t &input_notification)
 
             uart_xmodem_req_t xmodem_req = {};
             xmodem_req.buffer_ptr     = fw_image_buffer;
-            xmodem_req.buffer_size    = 0x10000;
+            xmodem_req.buffer_size    = 0x70000;
             xmodem_req.hdr.opcode     = static_cast<uint32_t>(UartOpcode::XMODEM_RECEIVE);
             xmodem_req.hdr.ctx        = &uart_ctx;
             xmodem_req.hdr.resp_queue = &resp;
@@ -171,10 +171,13 @@ void main_task(void *task_params)
 
    main_print.out("Starting main task loop.\r\n");
 
+   main_req_msg_u     req_msg = {};
+   generic_resp_msg_t resp_msg = {};
+
    while (1)
    {
-      main_req_msg_u     req_msg  = {};
-      generic_resp_msg_t resp_msg = {};
+      req_msg  = {};
+      resp_msg = {};
 
       main_print.handle_queue();
 

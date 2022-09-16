@@ -5,9 +5,12 @@
 
 // Only basic init in this file for now in order to get the screen off of a bright white, needs filling out to do anything
 
-static bool initialized = false;
+namespace
+{
+   bool initialized = false;
+}
 
-LCD::LCD(void)
+LCD::LCD(uint32_t horizontal_res, uint32_t vertical_res, color_depths color_depth)
 {
    // Values taken from CubeMX generated code
    this->ltdcInstance = 
@@ -35,9 +38,13 @@ LCD::LCD(void)
          }
       }
    };
+
+   this->color_depth    = color_depth;
+   this->horizontal_res = horizontal_res;
+   this->vertical_res   = vertical_res;
 }
 
-void LCD::init(void)
+void LCD::init(uint32_t frame_buffer_address)
 {
    if (initialized)
    {
@@ -51,6 +58,29 @@ void LCD::init(void)
       {
          assert_msg(0, "Error in HAL_LTDC_Init!\r\n");
       }
+      this->frame_buffer_address = frame_buffer_address;
+      LTDC_LayerCfgTypeDef layer_cfg = 
+      {
+         .WindowX0 = 0,
+         .WindowX1 = 480,
+         .WindowY0 = 0,
+         .WindowY1 = 272,
+         .PixelFormat = LTDC_PIXEL_FORMAT_RGB565, // Make this an option
+         .Alpha = 255,
+         .Alpha0 = 0,
+         .BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA,
+         .BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA,
+         .FBStartAdress = this->frame_buffer_address,
+         .ImageWidth = 480,
+         .ImageHeight = 272,
+         .Backcolor =
+         {
+            .Blue = 0,
+            .Green = 0,
+            .Red = 0
+         }
+      };
+      this->config_layer(&layer_cfg);
    }
 }
 
@@ -59,5 +89,49 @@ void LCD::config_layer(LTDC_LayerCfgTypeDef *layer_cfg)
    if (HAL_LTDC_ConfigLayer(&this->ltdcInstance, layer_cfg, 0) != HAL_OK)
    {
       assert_param(0);
+   }
+}
+
+LCD::color_depths LCD::get_color_depth(void)
+{
+   return this->color_depth;
+}
+
+uint32_t LCD::get_horizontal_res(void)
+{
+   return this->horizontal_res;
+}
+
+uint32_t LCD::get_vertical_res(void)
+{
+   return this->vertical_res;
+}
+
+void LCD::flush(void)
+{
+   HAL_LTDC_Reload(&this->ltdcInstance, LTDC_RELOAD_VERTICAL_BLANKING);
+}
+
+void LCD::set_pixel(uint32_t x, uint32_t y, uint16_t color)
+{
+   // (y * horizontal_res) + x = index into framebuffer to set
+   uint32_t index = (y * this->horizontal_res) + x;
+   
+   switch(this->color_depth)
+   {
+      case color_depths::COLOR_DEPTH_16:
+      {
+         uint16_t *frame_buffer = reinterpret_cast<uint16_t *>(this->frame_buffer_address);
+         frame_buffer[index]    = color;
+         break;
+      }
+      case color_depths::COLOR_DEPTH_8:
+      {
+         uint8_t *frame_buffer = reinterpret_cast<uint8_t *>(this->frame_buffer_address);
+         frame_buffer[index]   = color;
+         break;
+      }
+      default:
+         assert_param(0);
    }
 }

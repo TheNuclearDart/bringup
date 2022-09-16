@@ -61,12 +61,20 @@ target_include_directories(${TARGET} PUBLIC
    # FreeRTOS
    ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/include
    ${CMAKE_CURRENT_LIST_DIR}/third_party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1
+   # LVGL
+   ${CMAKE_CURRENT_LIST_DIR}/third_party/lvgl
 )
 
 add_compile_definitions(STM32F746xx USE_HAL_DRIVER USE_FULL_ASSERT)
 
 # add_subdirectory for bootloader?
 add_subdirectory(core/bootloader)
+
+# LVGL specific
+set(LV_CONF_PATH
+   ${CMAKE_CURRENT_LIST_DIR}/core/lv_conf.h
+   CACHE STRING "" FORCE
+)
 
 # add_subdirectory _after_ actions, so that subdirs inherit variables and such
 add_subdirectory(core/assert)
@@ -80,7 +88,9 @@ add_subdirectory(core/print)
 add_subdirectory(core/shared_data)
 add_subdirectory(core/uart)
 add_subdirectory(core/usb_host)
-target_link_libraries(${TARGET} assert crc flash fw_image fw_tasks fw_update lcd shared_data uart usb_host)
+add_subdirectory(third_party/lvgl)
+target_link_libraries(${TARGET} assert crc flash fw_image fw_tasks fw_update lcd lvgl::lvgl shared_data uart usb_host)
+
 # Strip out the debug sections from the .elf for breaking up into the binary, but leave the old .elf for debugging
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objcopy -g ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}.elf ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}_stripped.elf)
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND arm-none-eabi-objdump -h ${CMAKE_CURRENT_LIST_DIR}/build/${TARGET}_stripped.elf > ${CMAKE_CURRENT_LIST_DIR}/build/sections.txt)
