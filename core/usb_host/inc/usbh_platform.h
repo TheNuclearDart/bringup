@@ -28,6 +28,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdio.h>
+#include <stdint.h>
 
 /* USER CODE BEGIN INCLUDE */
 

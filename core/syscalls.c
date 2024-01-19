@@ -23,7 +23,7 @@ int _write(int file, char *ptr, int len)
 
 // Absolutely needed for printf
 // Maybe this is too simple for FreeRtos?? But it seems like we never reach here anyway.
-caddr_t _sbrk(int incr)
+void * _sbrk(int incr)
 {
    uint8_t *heap = &end; // This 'end' is the start of the heap, defined in .ld script
 
@@ -31,7 +31,7 @@ caddr_t _sbrk(int incr)
 
    heap += incr;
 
-   return (caddr_t)prev_heap;
+   return (void *)prev_heap;
 }
 
 int _close(int file) {
