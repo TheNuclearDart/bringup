@@ -44,6 +44,7 @@ HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
 
 # C Defines
+# For intellisense, I think c_cpp_properties.json needs these added so it doesn't give errors
 C_DEFS = \
 -DSTM32F746xx \
 -DUSE_HAL_DRIVER \
