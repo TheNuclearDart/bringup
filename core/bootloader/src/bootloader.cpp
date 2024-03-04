@@ -9,6 +9,7 @@
 #include "stm32f7xx.h"
 #include "syscalls.h"
 
+#include "assert.h"
 #include "crc.h"
 #include "fw_image.h"
 #include "gpio_defines.h"
@@ -287,6 +288,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(ARDUINO_SCK_D13_GPIO_Port, &GPIO_InitStruct);
 }
 
+#ifdef SDRAM_TEST
 static void ram_test(void)
 {
    uint32_t *ram_start = &__sdram_start__;
@@ -305,6 +307,7 @@ static void ram_test(void)
       ram_start++;
    }
 }
+#endif
 
 // Taken from ST Micro demo code.
 static void MPU_Config(void)
@@ -383,12 +386,12 @@ int main(void)
 
    printf("SDRAM Initialized...\r\n");
 
-   if (SDRAM_TEST)
-   {
-      printf("Starting SDRAM test...\r\n");
-      ram_test();
-      printf("SDRAM test passed!\r\n");
-   }
+#ifdef SDRAM_TEST
+   printf("Starting SDRAM test...\r\n");
+   ram_test();
+   printf("SDRAM test passed!\r\n");
+#endif
+
    // memset the ram?
    uint32_t *ram_start = &__sdram_start__;
    uint32_t ram_size  = reinterpret_cast<uint32_t>(&__sdram_size__);

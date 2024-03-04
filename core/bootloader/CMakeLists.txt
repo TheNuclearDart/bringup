@@ -34,6 +34,7 @@ add_executable(${TARGET} ${SRC})
 target_include_directories(${TARGET} PUBLIC
    ${CMAKE_CURRENT_LIST_DIR}/inc
    ${CMAKE_SOURCE_DIR}/core/
+   ${CMAKE_SOURCE_DIR}/core/assert/inc
    ${CMAKE_SOURCE_DIR}/core/board_defines/inc
    ${CMAKE_SOURCE_DIR}/core/interrupts/inc
    ${CMAKE_SOURCE_DIR}/core/memory_layout/inc
