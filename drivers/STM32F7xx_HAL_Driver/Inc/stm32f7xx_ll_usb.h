@@ -38,6 +38,10 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 
+#ifndef HAL_USB_CURRENT_MODE_MAX_DELAY_MS
+#define HAL_USB_CURRENT_MODE_MAX_DELAY_MS                           200U
+#endif /* define HAL_USB_CURRENT_MODE_MAX_DELAY_MS */
+
 /**
   * @brief  USB Mode definition
   */
@@ -71,6 +75,7 @@ typedef enum
   HC_IDLE = 0,
   HC_XFRC,
   HC_HALTED,
+  HC_ACK,
   HC_NAK,
   HC_NYET,
   HC_STALL,
@@ -129,6 +134,9 @@ typedef struct
                                        This parameter must be a number between Min_Data = 0 and Max_Data = 1    */
 
   uint8_t   is_stall;             /*!< Endpoint stall condition
+                                       This parameter must be a number between Min_Data = 0 and Max_Data = 1    */
+
+  uint8_t   is_iso_incomplete;    /*!< Endpoint isoc condition
                                        This parameter must be a number between Min_Data = 0 and Max_Data = 1    */
 
   uint8_t   type;                 /*!< Endpoint type
@@ -190,7 +198,7 @@ typedef struct
 
   uint8_t   *xfer_buff;         /*!< Pointer to transfer buffer.                                                */
 
-  uint32_t  XferSize;             /*!< OTG Channel transfer size.                                                   */
+  uint32_t  XferSize;             /*!< OTG Channel transfer size.                                               */
 
   uint32_t  xfer_len;           /*!< Current transfer length.                                                   */
 
@@ -426,7 +434,7 @@ typedef struct
 
 #ifdef USB_HS_PHYC /* Legacy name for USBPHYC defined in CMSIS device but USBCPHYC used in USB driver to determine if peripheral is present or not */
 #define USBPHYC   USB_HS_PHYC
-#endif
+#endif /* USB_HS_PHYC */
 #endif /* defined (USB_OTG_FS) || defined (USB_OTG_HS) */
 
 #define EP_ADDR_MSK                            0xFU
@@ -479,6 +487,7 @@ HAL_StatusTypeDef USB_WritePacket(USB_OTG_GlobalTypeDef *USBx, uint8_t *src,
 void             *USB_ReadPacket(USB_OTG_GlobalTypeDef *USBx, uint8_t *dest, uint16_t len);
 HAL_StatusTypeDef USB_EPSetStall(USB_OTG_GlobalTypeDef *USBx, USB_OTG_EPTypeDef *ep);
 HAL_StatusTypeDef USB_EPClearStall(USB_OTG_GlobalTypeDef *USBx, USB_OTG_EPTypeDef *ep);
+HAL_StatusTypeDef USB_EPStopXfer(USB_OTG_GlobalTypeDef *USBx, USB_OTG_EPTypeDef *ep);
 HAL_StatusTypeDef USB_SetDevAddress(USB_OTG_GlobalTypeDef *USBx, uint8_t address);
 HAL_StatusTypeDef USB_DevConnect(USB_OTG_GlobalTypeDef *USBx);
 HAL_StatusTypeDef USB_DevDisconnect(USB_OTG_GlobalTypeDef *USBx);
@@ -488,6 +497,7 @@ HAL_StatusTypeDef USB_EP0_OutStart(USB_OTG_GlobalTypeDef *USBx, uint8_t dma, uin
 uint8_t           USB_GetDevSpeed(USB_OTG_GlobalTypeDef *USBx);
 uint32_t          USB_GetMode(USB_OTG_GlobalTypeDef *USBx);
 uint32_t          USB_ReadInterrupts(USB_OTG_GlobalTypeDef *USBx);
+uint32_t          USB_ReadChInterrupts(USB_OTG_GlobalTypeDef *USBx, uint8_t chnum);
 uint32_t          USB_ReadDevAllOutEpInterrupt(USB_OTG_GlobalTypeDef *USBx);
 uint32_t          USB_ReadDevOutEPInterrupt(USB_OTG_GlobalTypeDef *USBx, uint8_t epnum);
 uint32_t          USB_ReadDevAllInEpInterrupt(USB_OTG_GlobalTypeDef *USBx);

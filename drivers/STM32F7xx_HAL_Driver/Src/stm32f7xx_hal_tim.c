@@ -278,6 +278,7 @@ HAL_StatusTypeDef HAL_TIM_Base_Init(TIM_HandleTypeDef *htim)
   assert_param(IS_TIM_INSTANCE(htim->Instance));
   assert_param(IS_TIM_COUNTER_MODE(htim->Init.CounterMode));
   assert_param(IS_TIM_CLOCKDIVISION_DIV(htim->Init.ClockDivision));
+  assert_param(IS_TIM_PERIOD(htim, htim->Init.Period));
   assert_param(IS_TIM_AUTORELOAD_PRELOAD(htim->Init.AutoReloadPreload));
 
   if (htim->State == HAL_TIM_STATE_RESET)
@@ -539,7 +540,7 @@ HAL_StatusTypeDef HAL_TIM_Base_Start_DMA(TIM_HandleTypeDef *htim, const uint32_t
   }
   else if (htim->State == HAL_TIM_STATE_READY)
   {
-    if ((pData == NULL) && (Length > 0U))
+    if ((pData == NULL) || (Length == 0U))
     {
       return HAL_ERROR;
     }
@@ -661,6 +662,7 @@ HAL_StatusTypeDef HAL_TIM_OC_Init(TIM_HandleTypeDef *htim)
   assert_param(IS_TIM_INSTANCE(htim->Instance));
   assert_param(IS_TIM_COUNTER_MODE(htim->Init.CounterMode));
   assert_param(IS_TIM_CLOCKDIVISION_DIV(htim->Init.ClockDivision));
+  assert_param(IS_TIM_PERIOD(htim, htim->Init.Period));
   assert_param(IS_TIM_AUTORELOAD_PRELOAD(htim->Init.AutoReloadPreload));
 
   if (htim->State == HAL_TIM_STATE_RESET)
@@ -1066,7 +1068,7 @@ HAL_StatusTypeDef HAL_TIM_OC_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Channel
   }
   else if (TIM_CHANNEL_STATE_GET(htim, Channel) == HAL_TIM_CHANNEL_STATE_READY)
   {
-    if ((pData == NULL) && (Length > 0U))
+    if ((pData == NULL) || (Length == 0U))
     {
       return HAL_ERROR;
     }
@@ -1329,6 +1331,7 @@ HAL_StatusTypeDef HAL_TIM_PWM_Init(TIM_HandleTypeDef *htim)
   assert_param(IS_TIM_INSTANCE(htim->Instance));
   assert_param(IS_TIM_COUNTER_MODE(htim->Init.CounterMode));
   assert_param(IS_TIM_CLOCKDIVISION_DIV(htim->Init.ClockDivision));
+  assert_param(IS_TIM_PERIOD(htim, htim->Init.Period));
   assert_param(IS_TIM_AUTORELOAD_PRELOAD(htim->Init.AutoReloadPreload));
 
   if (htim->State == HAL_TIM_STATE_RESET)
@@ -1734,7 +1737,7 @@ HAL_StatusTypeDef HAL_TIM_PWM_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Channe
   }
   else if (TIM_CHANNEL_STATE_GET(htim, Channel) == HAL_TIM_CHANNEL_STATE_READY)
   {
-    if ((pData == NULL) && (Length > 0U))
+    if ((pData == NULL) || (Length == 0U))
     {
       return HAL_ERROR;
     }
@@ -1996,6 +1999,7 @@ HAL_StatusTypeDef HAL_TIM_IC_Init(TIM_HandleTypeDef *htim)
   assert_param(IS_TIM_INSTANCE(htim->Instance));
   assert_param(IS_TIM_COUNTER_MODE(htim->Init.CounterMode));
   assert_param(IS_TIM_CLOCKDIVISION_DIV(htim->Init.ClockDivision));
+  assert_param(IS_TIM_PERIOD(htim, htim->Init.Period));
   assert_param(IS_TIM_AUTORELOAD_PRELOAD(htim->Init.AutoReloadPreload));
 
   if (htim->State == HAL_TIM_STATE_RESET)
@@ -2389,7 +2393,7 @@ HAL_StatusTypeDef HAL_TIM_IC_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Channel
   else if ((channel_state == HAL_TIM_CHANNEL_STATE_READY)
            && (complementary_channel_state == HAL_TIM_CHANNEL_STATE_READY))
   {
-    if ((pData == NULL) && (Length > 0U))
+    if ((pData == NULL) || (Length == 0U))
     {
       return HAL_ERROR;
     }
@@ -2645,6 +2649,7 @@ HAL_StatusTypeDef HAL_TIM_OnePulse_Init(TIM_HandleTypeDef *htim, uint32_t OnePul
   assert_param(IS_TIM_COUNTER_MODE(htim->Init.CounterMode));
   assert_param(IS_TIM_CLOCKDIVISION_DIV(htim->Init.ClockDivision));
   assert_param(IS_TIM_OPM_MODE(OnePulseMode));
+  assert_param(IS_TIM_PERIOD(htim, htim->Init.Period));
   assert_param(IS_TIM_AUTORELOAD_PRELOAD(htim->Init.AutoReloadPreload));
 
   if (htim->State == HAL_TIM_STATE_RESET)
@@ -3048,6 +3053,7 @@ HAL_StatusTypeDef HAL_TIM_Encoder_Init(TIM_HandleTypeDef *htim,  TIM_Encoder_Ini
   assert_param(IS_TIM_IC_PRESCALER(sConfig->IC2Prescaler));
   assert_param(IS_TIM_IC_FILTER(sConfig->IC1Filter));
   assert_param(IS_TIM_IC_FILTER(sConfig->IC2Filter));
+  assert_param(IS_TIM_PERIOD(htim, htim->Init.Period));
 
   if (htim->State == HAL_TIM_STATE_RESET)
   {
@@ -3557,7 +3563,7 @@ HAL_StatusTypeDef HAL_TIM_Encoder_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Ch
     else if ((channel_1_state == HAL_TIM_CHANNEL_STATE_READY)
              && (complementary_channel_1_state == HAL_TIM_CHANNEL_STATE_READY))
     {
-      if ((pData1 == NULL) && (Length > 0U))
+      if ((pData1 == NULL) || (Length == 0U))
       {
         return HAL_ERROR;
       }
@@ -3582,7 +3588,7 @@ HAL_StatusTypeDef HAL_TIM_Encoder_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Ch
     else if ((channel_2_state == HAL_TIM_CHANNEL_STATE_READY)
              && (complementary_channel_2_state == HAL_TIM_CHANNEL_STATE_READY))
     {
-      if ((pData2 == NULL) && (Length > 0U))
+      if ((pData2 == NULL) || (Length == 0U))
       {
         return HAL_ERROR;
       }
@@ -3611,7 +3617,7 @@ HAL_StatusTypeDef HAL_TIM_Encoder_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Ch
              && (complementary_channel_1_state == HAL_TIM_CHANNEL_STATE_READY)
              && (complementary_channel_2_state == HAL_TIM_CHANNEL_STATE_READY))
     {
-      if ((((pData1 == NULL) || (pData2 == NULL))) && (Length > 0U))
+      if ((((pData1 == NULL) || (pData2 == NULL))) || (Length == 0U))
       {
         return HAL_ERROR;
       }
@@ -3827,10 +3833,13 @@ HAL_StatusTypeDef HAL_TIM_Encoder_Stop_DMA(TIM_HandleTypeDef *htim, uint32_t Cha
   */
 void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
 {
+  uint32_t itsource = htim->Instance->DIER;
+  uint32_t itflag   = htim->Instance->SR;
+
   /* Capture compare 1 event */
-  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_CC1) != RESET)
+  if ((itflag & (TIM_FLAG_CC1)) == (TIM_FLAG_CC1))
   {
-    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_CC1) != RESET)
+    if ((itsource & (TIM_IT_CC1)) == (TIM_IT_CC1))
     {
       {
         __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC1);
@@ -3861,9 +3870,9 @@ void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
     }
   }
   /* Capture compare 2 event */
-  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_CC2) != RESET)
+  if ((itflag & (TIM_FLAG_CC2)) == (TIM_FLAG_CC2))
   {
-    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_CC2) != RESET)
+    if ((itsource & (TIM_IT_CC2)) == (TIM_IT_CC2))
     {
       __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC2);
       htim->Channel = HAL_TIM_ACTIVE_CHANNEL_2;
@@ -3891,9 +3900,9 @@ void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
     }
   }
   /* Capture compare 3 event */
-  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_CC3) != RESET)
+  if ((itflag & (TIM_FLAG_CC3)) == (TIM_FLAG_CC3))
   {
-    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_CC3) != RESET)
+    if ((itsource & (TIM_IT_CC3)) == (TIM_IT_CC3))
     {
       __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC3);
       htim->Channel = HAL_TIM_ACTIVE_CHANNEL_3;
@@ -3921,9 +3930,9 @@ void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
     }
   }
   /* Capture compare 4 event */
-  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_CC4) != RESET)
+  if ((itflag & (TIM_FLAG_CC4)) == (TIM_FLAG_CC4))
   {
-    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_CC4) != RESET)
+    if ((itsource & (TIM_IT_CC4)) == (TIM_IT_CC4))
     {
       __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC4);
       htim->Channel = HAL_TIM_ACTIVE_CHANNEL_4;
@@ -3951,9 +3960,9 @@ void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
     }
   }
   /* TIM Update event */
-  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_UPDATE) != RESET)
+  if ((itflag & (TIM_FLAG_UPDATE)) == (TIM_FLAG_UPDATE))
   {
-    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_UPDATE) != RESET)
+    if ((itsource & (TIM_IT_UPDATE)) == (TIM_IT_UPDATE))
     {
       __HAL_TIM_CLEAR_IT(htim, TIM_IT_UPDATE);
 #if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
@@ -3964,9 +3973,9 @@ void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
     }
   }
   /* TIM Break input event */
-  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_BREAK) != RESET)
+  if ((itflag & (TIM_FLAG_BREAK)) == (TIM_FLAG_BREAK))
   {
-    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_BREAK) != RESET)
+    if ((itsource & (TIM_IT_BREAK)) == (TIM_IT_BREAK))
     {
       __HAL_TIM_CLEAR_IT(htim, TIM_IT_BREAK);
 #if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
@@ -3977,9 +3986,9 @@ void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
     }
   }
   /* TIM Break2 input event */
-  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_BREAK2) != RESET)
+  if ((itflag & (TIM_FLAG_BREAK2)) == (TIM_FLAG_BREAK2))
   {
-    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_BREAK) != RESET)
+    if ((itsource & (TIM_IT_BREAK)) == (TIM_IT_BREAK))
     {
       __HAL_TIM_CLEAR_FLAG(htim, TIM_FLAG_BREAK2);
 #if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
@@ -3990,9 +3999,9 @@ void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
     }
   }
   /* TIM Trigger detection event */
-  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_TRIGGER) != RESET)
+  if ((itflag & (TIM_FLAG_TRIGGER)) == (TIM_FLAG_TRIGGER))
   {
-    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_TRIGGER) != RESET)
+    if ((itsource & (TIM_IT_TRIGGER)) == (TIM_IT_TRIGGER))
     {
       __HAL_TIM_CLEAR_IT(htim, TIM_IT_TRIGGER);
 #if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
@@ -4003,9 +4012,9 @@ void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
     }
   }
   /* TIM commutation event */
-  if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_COM) != RESET)
+  if ((itflag & (TIM_FLAG_COM)) == (TIM_FLAG_COM))
   {
-    if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_COM) != RESET)
+    if ((itsource & (TIM_IT_COM)) == (TIM_IT_COM))
     {
       __HAL_TIM_CLEAR_IT(htim, TIM_FLAG_COM);
 #if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
@@ -5976,8 +5985,6 @@ HAL_StatusTypeDef HAL_TIM_RegisterCallback(TIM_HandleTypeDef *htim, HAL_TIM_Call
   {
     return HAL_ERROR;
   }
-  /* Process locked */
-  __HAL_LOCK(htim);
 
   if (htim->State == HAL_TIM_STATE_READY)
   {
@@ -6173,9 +6180,6 @@ HAL_StatusTypeDef HAL_TIM_RegisterCallback(TIM_HandleTypeDef *htim, HAL_TIM_Call
     status = HAL_ERROR;
   }
 
-  /* Release Lock */
-  __HAL_UNLOCK(htim);
-
   return status;
 }
 
@@ -6218,9 +6222,6 @@ HAL_StatusTypeDef HAL_TIM_RegisterCallback(TIM_HandleTypeDef *htim, HAL_TIM_Call
 HAL_StatusTypeDef HAL_TIM_UnRegisterCallback(TIM_HandleTypeDef *htim, HAL_TIM_CallbackIDTypeDef CallbackID)
 {
   HAL_StatusTypeDef status = HAL_OK;
-
-  /* Process locked */
-  __HAL_LOCK(htim);
 
   if (htim->State == HAL_TIM_STATE_READY)
   {
@@ -6457,9 +6458,6 @@ HAL_StatusTypeDef HAL_TIM_UnRegisterCallback(TIM_HandleTypeDef *htim, HAL_TIM_Ca
     /* Return error status */
     status = HAL_ERROR;
   }
-
-  /* Release Lock */
-  __HAL_UNLOCK(htim);
 
   return status;
 }
@@ -6967,6 +6965,13 @@ void TIM_Base_SetConfig(TIM_TypeDef *TIMx, const TIM_Base_InitTypeDef *Structure
   /* Generate an update event to reload the Prescaler
      and the repetition counter (only for advanced timer) value immediately */
   TIMx->EGR = TIM_EGR_UG;
+
+  /* Check if the update flag is set after the Update Generation, if so clear the UIF flag */
+  if (HAL_IS_BIT_SET(TIMx->SR, TIM_FLAG_UPDATE))
+  {
+    /* Clear the update flag */
+    CLEAR_BIT(TIMx->SR, TIM_FLAG_UPDATE);
+  }
 }
 
 /**

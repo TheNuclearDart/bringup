@@ -66,8 +66,8 @@
                                      || ((__VALUE__) == LL_TIM_OCMODE_RETRIG_OPM2) \
                                      || ((__VALUE__) == LL_TIM_OCMODE_COMBINED_PWM1) \
                                      || ((__VALUE__) == LL_TIM_OCMODE_COMBINED_PWM2) \
-                                     || ((__VALUE__) == LL_TIM_OCMODE_ASSYMETRIC_PWM1) \
-                                     || ((__VALUE__) == LL_TIM_OCMODE_ASSYMETRIC_PWM2))
+                                     || ((__VALUE__) == LL_TIM_OCMODE_ASYMMETRIC_PWM1) \
+                                     || ((__VALUE__) == LL_TIM_OCMODE_ASYMMETRIC_PWM2))
 
 #define IS_LL_TIM_OCSTATE(__VALUE__) (((__VALUE__) == LL_TIM_OCSTATE_DISABLE) \
                                       || ((__VALUE__) == LL_TIM_OCSTATE_ENABLE))
@@ -773,11 +773,8 @@ ErrorStatus LL_TIM_BDTR_Init(TIM_TypeDef *TIMx, const LL_TIM_BDTR_InitTypeDef *T
   MODIFY_REG(tmpbdtr, TIM_BDTR_BKP, TIM_BDTRInitStruct->BreakPolarity);
   MODIFY_REG(tmpbdtr, TIM_BDTR_AOE, TIM_BDTRInitStruct->AutomaticOutput);
   MODIFY_REG(tmpbdtr, TIM_BDTR_MOE, TIM_BDTRInitStruct->AutomaticOutput);
-  if (IS_TIM_ADVANCED_INSTANCE(TIMx))
-  {
-    assert_param(IS_LL_TIM_BREAK_FILTER(TIM_BDTRInitStruct->BreakFilter));
-    MODIFY_REG(tmpbdtr, TIM_BDTR_BKF, TIM_BDTRInitStruct->BreakFilter);
-  }
+  assert_param(IS_LL_TIM_BREAK_FILTER(TIM_BDTRInitStruct->BreakFilter));
+  MODIFY_REG(tmpbdtr, TIM_BDTR_BKF, TIM_BDTRInitStruct->BreakFilter);
 
   if (IS_TIM_BKIN2_INSTANCE(TIMx))
   {

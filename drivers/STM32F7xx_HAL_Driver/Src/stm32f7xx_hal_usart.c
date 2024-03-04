@@ -394,6 +394,8 @@ __weak void HAL_USART_MspDeInit(USART_HandleTypeDef *husart)
 /**
   * @brief  Register a User USART Callback
   *         To be used instead of the weak predefined callback
+  * @note   The HAL_USART_RegisterCallback() may be called before HAL_USART_Init() in HAL_USART_STATE_RESET
+  *         to register callbacks for HAL_USART_MSPINIT_CB_ID and HAL_USART_MSPDEINIT_CB_ID
   * @param  husart usart handle
   * @param  CallbackID ID of the callback to be registered
   *         This parameter can be one of the following values:
@@ -421,8 +423,6 @@ HAL_StatusTypeDef HAL_USART_RegisterCallback(USART_HandleTypeDef *husart, HAL_US
 
     return HAL_ERROR;
   }
-  /* Process locked */
-  __HAL_LOCK(husart);
 
   if (husart->State == HAL_USART_STATE_READY)
   {
@@ -504,15 +504,14 @@ HAL_StatusTypeDef HAL_USART_RegisterCallback(USART_HandleTypeDef *husart, HAL_US
     status =  HAL_ERROR;
   }
 
-  /* Release Lock */
-  __HAL_UNLOCK(husart);
-
   return status;
 }
 
 /**
   * @brief  Unregister an USART Callback
   *         USART callaback is redirected to the weak predefined callback
+  * @note   The HAL_USART_UnRegisterCallback() may be called before HAL_USART_Init() in HAL_USART_STATE_RESET
+  *         to un-register callbacks for HAL_USART_MSPINIT_CB_ID and HAL_USART_MSPDEINIT_CB_ID
   * @param  husart usart handle
   * @param  CallbackID ID of the callback to be unregistered
   *         This parameter can be one of the following values:
@@ -530,9 +529,6 @@ HAL_StatusTypeDef HAL_USART_RegisterCallback(USART_HandleTypeDef *husart, HAL_US
 HAL_StatusTypeDef HAL_USART_UnRegisterCallback(USART_HandleTypeDef *husart, HAL_USART_CallbackIDTypeDef CallbackID)
 {
   HAL_StatusTypeDef status = HAL_OK;
-
-  /* Process locked */
-  __HAL_LOCK(husart);
 
   if (HAL_USART_STATE_READY == husart->State)
   {
@@ -613,9 +609,6 @@ HAL_StatusTypeDef HAL_USART_UnRegisterCallback(USART_HandleTypeDef *husart, HAL_
     /* Return error status */
     status =  HAL_ERROR;
   }
-
-  /* Release Lock */
-  __HAL_UNLOCK(husart);
 
   return status;
 }
@@ -717,7 +710,8 @@ HAL_StatusTypeDef HAL_USART_UnRegisterCallback(USART_HandleTypeDef *husart, HAL_
   * @param  Timeout Timeout duration.
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_USART_Transmit(USART_HandleTypeDef *husart, const uint8_t *pTxData, uint16_t Size, uint32_t Timeout)
+HAL_StatusTypeDef HAL_USART_Transmit(USART_HandleTypeDef *husart, const uint8_t *pTxData, uint16_t Size,
+                                     uint32_t Timeout)
 {
   const uint8_t  *ptxdata8bits;
   const uint16_t *ptxdata16bits;
@@ -2300,7 +2294,7 @@ __weak void HAL_USART_AbortCpltCallback(USART_HandleTypeDef *husart)
   *              the configuration information for the specified USART.
   * @retval USART handle state
   */
-HAL_USART_StateTypeDef HAL_USART_GetState(USART_HandleTypeDef *husart)
+HAL_USART_StateTypeDef HAL_USART_GetState(const USART_HandleTypeDef *husart)
 {
   return husart->State;
 }
@@ -2311,7 +2305,7 @@ HAL_USART_StateTypeDef HAL_USART_GetState(USART_HandleTypeDef *husart)
   *              the configuration information for the specified USART.
   * @retval USART handle Error Code
   */
-uint32_t HAL_USART_GetError(USART_HandleTypeDef *husart)
+uint32_t HAL_USART_GetError(const USART_HandleTypeDef *husart)
 {
   return husart->ErrorCode;
 }
@@ -2819,7 +2813,7 @@ static HAL_StatusTypeDef USART_CheckIdleState(USART_HandleTypeDef *husart)
       return HAL_TIMEOUT;
     }
   }
-#endif
+#endif /* USART_ISR_REACK */
 
   /* Initialize the USART state*/
   husart->State = HAL_USART_STATE_READY;

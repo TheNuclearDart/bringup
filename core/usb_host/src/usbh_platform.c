@@ -24,7 +24,7 @@
 
 #include "stm32f7xx.h"
 
-#include <stdint.h>>
+#include <stdint.h>
 
 /* USER CODE BEGIN INCLUDE */
 

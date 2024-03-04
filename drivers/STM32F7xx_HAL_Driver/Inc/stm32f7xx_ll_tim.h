@@ -716,6 +716,15 @@ typedef struct
   */
 #endif /* USE_FULL_LL_DRIVER */
 
+/** Legacy definitions for compatibility purpose
+@cond 0
+  */
+#define LL_TIM_OCMODE_ASSYMETRIC_PWM1 LL_TIM_OCMODE_ASYMMETRIC_PWM1
+#define LL_TIM_OCMODE_ASSYMETRIC_PWM2 LL_TIM_OCMODE_ASYMMETRIC_PWM2
+/**
+@endcond
+  */
+
 /** @defgroup TIM_LL_EC_OCMODE Output Configuration Mode
   * @{
   */
@@ -731,8 +740,8 @@ typedef struct
 #define LL_TIM_OCMODE_RETRIG_OPM2              (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_0)                    /*!<Retrigerrable OPM mode 2*/
 #define LL_TIM_OCMODE_COMBINED_PWM1            (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_2)                    /*!<Combined PWM mode 1*/
 #define LL_TIM_OCMODE_COMBINED_PWM2            (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC1M_2) /*!<Combined PWM mode 2*/
-#define LL_TIM_OCMODE_ASSYMETRIC_PWM1          (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2) /*!<Asymmetric PWM mode 1*/
-#define LL_TIM_OCMODE_ASSYMETRIC_PWM2          (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M)                      /*!<Asymmetric PWM mode 2*/
+#define LL_TIM_OCMODE_ASYMMETRIC_PWM1          (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2) /*!<Asymmetric PWM mode 1*/
+#define LL_TIM_OCMODE_ASYMMETRIC_PWM2          (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M)                      /*!<Asymmetric PWM mode 2*/
 /**
   * @}
   */
@@ -1186,10 +1195,6 @@ typedef struct
 #define LL_TIM_ReadReg(__INSTANCE__, __REG__) READ_REG((__INSTANCE__)->__REG__)
 /**
   * @}
-  */
-
-/** @defgroup TIM_LL_EM_Exported_Macros Exported_Macros
-  * @{
   */
 
 /**
@@ -1981,8 +1986,8 @@ __STATIC_INLINE void LL_TIM_OC_ConfigOutput(TIM_TypeDef *TIMx, uint32_t Channel,
   *         @arg @ref LL_TIM_OCMODE_RETRIG_OPM2
   *         @arg @ref LL_TIM_OCMODE_COMBINED_PWM1
   *         @arg @ref LL_TIM_OCMODE_COMBINED_PWM2
-  *         @arg @ref LL_TIM_OCMODE_ASSYMETRIC_PWM1
-  *         @arg @ref LL_TIM_OCMODE_ASSYMETRIC_PWM2
+  *         @arg @ref LL_TIM_OCMODE_ASYMMETRIC_PWM1
+  *         @arg @ref LL_TIM_OCMODE_ASYMMETRIC_PWM2
   * @retval None
   */
 __STATIC_INLINE void LL_TIM_OC_SetMode(TIM_TypeDef *TIMx, uint32_t Channel, uint32_t Mode)
@@ -2021,8 +2026,8 @@ __STATIC_INLINE void LL_TIM_OC_SetMode(TIM_TypeDef *TIMx, uint32_t Channel, uint
   *         @arg @ref LL_TIM_OCMODE_RETRIG_OPM2
   *         @arg @ref LL_TIM_OCMODE_COMBINED_PWM1
   *         @arg @ref LL_TIM_OCMODE_COMBINED_PWM2
-  *         @arg @ref LL_TIM_OCMODE_ASSYMETRIC_PWM1
-  *         @arg @ref LL_TIM_OCMODE_ASSYMETRIC_PWM2
+  *         @arg @ref LL_TIM_OCMODE_ASYMMETRIC_PWM1
+  *         @arg @ref LL_TIM_OCMODE_ASYMMETRIC_PWM2
   */
 __STATIC_INLINE uint32_t LL_TIM_OC_GetMode(const TIM_TypeDef *TIMx, uint32_t Channel)
 {
@@ -3564,10 +3569,10 @@ __STATIC_INLINE void LL_TIM_DisableBreakInputSource(TIM_TypeDef *TIMx, uint32_t 
   * @brief  Set the polarity of the break signal for the timer break input.
   * @note Macro IS_TIM_BREAKSOURCE_INSTANCE(TIMx) can be used to check whether
   *       or not a timer instance allows for break input selection.
-  * @rmtoll AF1          BKINE          LL_TIM_SetBreakInputSourcePolarity\n
-  *         AF1          BKDFBKE        LL_TIM_SetBreakInputSourcePolarity\n
-  *         AF2          BK2INE         LL_TIM_SetBreakInputSourcePolarity\n
-  *         AF2          BK2DFBKE       LL_TIM_SetBreakInputSourcePolarity
+  * @rmtoll AF1          BKINP          LL_TIM_SetBreakInputSourcePolarity\n
+  *         AF1          BKDFBKP        LL_TIM_SetBreakInputSourcePolarity\n
+  *         AF2          BK2INP         LL_TIM_SetBreakInputSourcePolarity\n
+  *         AF2          BK2DFBKP       LL_TIM_SetBreakInputSourcePolarity
   * @param  TIMx Timer instance
   * @param  BreakInput This parameter can be one of the following values:
   *         @arg @ref LL_TIM_BREAK_INPUT_BKIN
