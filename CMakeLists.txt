@@ -1,6 +1,6 @@
-project(blink LANGUAGES CXX C ASM)
-
 cmake_minimum_required(VERSION 3.23.1)
+
+project(blink LANGUAGES CXX C ASM)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
