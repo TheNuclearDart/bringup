@@ -63,7 +63,7 @@ static void handle_uart_req(uart_req_msg_u &req_msg)
             // Construct the response message
             uart_xmodem_resp_t xmodem_resp = {};
 
-            xmodem_resp.hdr.ctx = req_msg.generic_msg.generic_hdr.ctx; // Pass the generic ctx back to sender
+            xmodem_resp.hdr.requester_opcode = req_msg.generic_msg.generic_hdr.requester_opcode; // Pass the generic ctx back to sender
             xmodem_resp.status  = status;
             xQueueSend(*req_msg.generic_msg.generic_hdr.resp_queue, &xmodem_resp, 0);
          }

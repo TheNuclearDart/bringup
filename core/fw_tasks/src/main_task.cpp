@@ -23,7 +23,6 @@ namespace
    // moving to UART taskUART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, 1000);
    LCD lcd;
    uint8_t fw_image_buffer[0x10000]; // Arbitrary size, but it's going to need to be bigger (and likely in external RAM) once the image gets bigger
-   generic_task_ctx_t uart_ctx;
    Print main_print("main");
    //USB_Host usb;
 }
@@ -109,16 +108,12 @@ void handle_input_notification(input_notification_msg_t &input_notification)
    {
       case InputType::BLUE_BUTTON:
          {
-            // Construct and send an Xmodem receive req
-            uart_ctx = {};
-            uart_ctx.opcode = static_cast<uint32_t>(MainOpcode::XMODEM_RECEIVE);
-
-            uart_xmodem_req_t xmodem_req = {};
-            xmodem_req.buffer_ptr     = fw_image_buffer;
-            xmodem_req.buffer_size    = 0x10000;
-            xmodem_req.hdr.opcode     = static_cast<uint32_t>(UartOpcode::XMODEM_RECEIVE);
-            xmodem_req.hdr.ctx        = &uart_ctx;
-            xmodem_req.hdr.resp_queue = &main_resp_queue;
+            uart_xmodem_req_t xmodem_req        = {};
+            xmodem_req.buffer_ptr               = fw_image_buffer;
+            xmodem_req.buffer_size              = 0x10000;
+            xmodem_req.hdr.opcode               = static_cast<uint32_t>(UartOpcode::XMODEM_RECEIVE); // Note the difference between UartOpcode and MainOpcode
+            xmodem_req.hdr.requester_opcode     = static_cast<uint32_t>(MainOpcode::XMODEM_RECEIVE);
+            xmodem_req.hdr.resp_queue           = &main_resp_queue;
 
             xQueueSend(uart_req_queue, &xmodem_req, UINT32_MAX);
          }
@@ -152,7 +147,7 @@ void handle_request(main_req_msg_u &req_msg)
 void handle_resp(generic_resp_msg_t &resp_msg)
 {
    // Determine how to treat this based off of the attached context
-   MainOpcode opcode = static_cast<MainOpcode>(resp_msg.generic_hdr.ctx->opcode);
+   MainOpcode opcode = static_cast<MainOpcode>(resp_msg.generic_hdr.requester_opcode);
 
    switch(opcode)
    {

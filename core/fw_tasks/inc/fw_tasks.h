@@ -10,23 +10,17 @@
 
 #define MAX_MSG_SIZE 128
 
-// Generic task context
-typedef struct _generic_task_ctx_t
-{
-   uint32_t opcode;
-} generic_task_ctx_t;
-
 // Generic message types
 typedef struct _generic_req_hdr_t
 {
    uint32_t            opcode;
-   generic_task_ctx_t *ctx;
+   uint32_t            requester_opcode;
    QueueHandle_t      *resp_queue;
 } generic_req_hdr_t;
 
 typedef struct _generic_resp_msg_hdr_t
 {
-   generic_task_ctx_t *ctx;
+   uint32_t requester_opcode;
 } generic_resp_hdr_t;
 
 typedef struct _generic_req_msg_t
