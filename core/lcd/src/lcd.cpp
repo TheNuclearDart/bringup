@@ -65,7 +65,7 @@ void LCD::init(uint32_t frame_buffer_address)
          .WindowX1 = 480,
          .WindowY0 = 0,
          .WindowY1 = 272,
-         .PixelFormat = LTDC_PIXEL_FORMAT_RGB565, // Make this an option
+         .PixelFormat = LTDC_PIXEL_FORMAT_RGB888, // Make this an option
          .Alpha = 255,
          .Alpha0 = 0,
          .BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA,
@@ -112,23 +112,29 @@ void LCD::flush(void)
    HAL_LTDC_Reload(&this->ltdcInstance, LTDC_RELOAD_VERTICAL_BLANKING);
 }
 
-void LCD::set_pixel(uint32_t x, uint32_t y, uint16_t color)
+void LCD::set_pixel(uint32_t x, uint32_t y, lcd_pixel_t color)
 {
    // (y * horizontal_res) + x = index into framebuffer to set
    uint32_t index = (y * this->horizontal_res) + x;
    
    switch(this->color_depth)
    {
+      case color_depths::COLOR_DEPTH_24:
+      {
+         lcd_pixel_t *frame_buffer = reinterpret_cast<lcd_pixel_t *>(this->frame_buffer_address);
+         frame_buffer[index] = color; 
+         break;
+      }
       case color_depths::COLOR_DEPTH_16:
       {
          uint16_t *frame_buffer = reinterpret_cast<uint16_t *>(this->frame_buffer_address);
-         frame_buffer[index]    = color;
+         //fixmeframe_buffer[index]    = color;
          break;
       }
       case color_depths::COLOR_DEPTH_8:
       {
          uint8_t *frame_buffer = reinterpret_cast<uint8_t *>(this->frame_buffer_address);
-         frame_buffer[index]   = color;
+         //fixmeframe_buffer[index]   = color;
          break;
       }
       default:

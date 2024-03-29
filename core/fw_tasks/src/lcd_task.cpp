@@ -20,16 +20,14 @@ namespace
 {
    LCD                lcd(480, 272, LCD::color_depths::COLOR_DEPTH_16);
    Print              lcd_print("lcd");
-   lv_disp_draw_buf_t draw_buf;
    lv_color_t         buf1[(480 * 272) / 10];
    lv_color_t         buf2[(480 * 272) / 10]; // There might be a better solution to all of this
-   lv_disp_drv_t      disp_drv;
    lv_obj_t          *btn;
    lv_disp_t         *disp;
 }
 
 // Basic implementation to start I guess
-void lcd_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
+void lcd_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
 {
    // There must be a much quicker way of doing this.
    // Also need to look into DMA for this.
@@ -39,8 +37,9 @@ void lcd_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
    {
       for (int32_t x = area->x1; x <= area->x2; x++)
       {
-         lcd.set_pixel(x, y, color_p->full);
-         color_p++;
+         lcd_pixel_t *color = reinterpret_cast<lcd_pixel_t *>(px_map);
+         lcd.set_pixel(x, y, *color);
+         color++;
       }
    }
    //lcd.flush(); // This is what is actually causing the hard fault.
@@ -63,6 +62,12 @@ void lcd_task_init(void)
    lcd.init(reinterpret_cast<uint32_t>(&_sfbuffer));
    
    lv_init();
+
+   disp = lv_display_create(480, 272);
+
+   lv_display_set_buffers(disp, buf1, buf2, sizeof(buf1), LV_DISPLAY_RENDER_MODE_DIRECT);
+
+   lv_display_set_flush_cb(disp, lcd_flush);
 
    lcd_print.init(&uart_queues::req);
 }
@@ -89,14 +94,6 @@ void lcd_task(void *task_params)
 {
    using namespace lcd_queues;
 
-   lv_disp_draw_buf_init(&draw_buf, buf1, buf2, (480 * 272) / 10);
-
-   lv_disp_drv_init(&disp_drv);
-   disp_drv.flush_cb = &lcd_flush;
-   disp_drv.draw_buf = &draw_buf;
-   disp_drv.hor_res  = lcd.get_horizontal_res();
-   disp_drv.ver_res  = lcd.get_vertical_res();
-   disp = lv_disp_drv_register(&disp_drv);
 
    lcd_print.out("Starting lcd task loop.\r\n");
 
@@ -109,7 +106,9 @@ void lcd_task(void *task_params)
    }
    volatile uint32_t x = 180;
    volatile uint32_t y = 111;
-   setup_screen(btn, x, y);
+   //setup_screen(btn, x, y);
+
+   lcd_print.out("Starting lcd task loop.\r\n");
 
    while(1)
    {
