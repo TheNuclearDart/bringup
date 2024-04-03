@@ -8,19 +8,23 @@
 // For messaging
 #include "uart_task_msgs.h"
 
+namespace uart_queues
+{
+   QueueHandle_t req;
+   QueueHandle_t resp;
+}
+
 namespace
 {
    UART uart(USART1, 115200, UART_WORDLENGTH_8B, UART_STOPBITS_1, UART_PARITY_NONE, UART_MODE_TX_RX, UART_HWCONTROL_NONE, UART_OVERSAMPLING_16, UART_ONE_BIT_SAMPLE_DISABLE, 1000);
 }
 
-QueueHandle_t uart_req_queue;
-QueueHandle_t uart_resp_queue;
-
 void uart_task_init(void)
 {
+   using namespace uart_queues;
    // Create Queues to other tasks
-   uart_req_queue  = xQueueCreate(1, MAX_MSG_SIZE); // One message queue (for now), size of 128 bytes. These should be defined.
-   uart_resp_queue = xQueueCreate(1, MAX_MSG_SIZE);
+   req  = xQueueCreate(1, MAX_MSG_SIZE); // One message queue (for now), size of 128 bytes. These should be defined.
+   resp = xQueueCreate(1, MAX_MSG_SIZE);
 
    uart.init();
 }
@@ -81,16 +85,23 @@ static void handle_uart_req(uart_req_msg_u &req_msg)
 
 void uart_task(void *task_params) // Does this *have* to be void * for freeRTOS?
 {
+   using namespace uart_queues;
+
    uart.out_raw((uint8_t *)"[uart] Starting UART task loop.\r\n", 33, UINT32_MAX); // Doing this as the print library doesn't currently work for this task.
-   while(1)
+
+   uart_req_msg_u     req_msg = {};
+   generic_resp_msg_t resp_msg = {};
+
+   while (1)
    {
-      uart_req_msg_u  req_msg  = {};
-      uart_resp_msg_u resp_msg = {};
-      if (xQueueReceive(uart_resp_queue, &resp_msg, 0) == pdTRUE)
+      req_msg  = {};
+      resp_msg = {};
+
+      if (xQueueReceive(resp, &resp_msg, 0) == pdTRUE)
       {
          /* Handle msg */
       }
-      if (xQueueReceive(uart_req_queue, &req_msg, 0) == pdTRUE)
+      if (xQueueReceive(req, &req_msg, 0) == pdTRUE)
       {
          handle_uart_req(req_msg);
       }

@@ -6,6 +6,10 @@
 #include "croutine.h"
 #include "task.h"
 #include "assert.h"
+#include "lvgl.h"
+
+// User defined heap for FreeRTOS. Allows relocation wherever we want. See linker script for actual location.
+uint8_t ucHeap[ configTOTAL_HEAP_SIZE ] __attribute__((section(".freertos_heap")));
 
 void vApplicationMallocFailedHook( void );
 
@@ -61,4 +65,9 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer,
     Note that, as the array is necessarily of type StackType_t,
     configMINIMAL_STACK_SIZE is specified in words, not bytes. */
     *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+}
+
+void vApplicationTickHook( void )
+{
+   lv_tick_inc(1); // The '1' should change to however often this function is called in ms
 }

@@ -67,6 +67,14 @@ SECTIONS
       . = ALIGN(4);
    } > SRAM
 
+   .freertos_heap (NOLOAD) :
+   {
+      . = ALIGN(4);
+      *(.freertos_heap)
+      *(.freertos_heap*)
+      . = ALIGN(4);
+   } > SRAM
+
    .text :
    {
       . = ALIGN(4);
@@ -153,7 +161,7 @@ SECTIONS
    {
       . = ALIGN(4);
       _sfbuffer = .;
-      . = . + 0x80000;
+      /* Instead of assigning empty buffer, LVGL buffer arrays are assigned here. I believe this is the correct way to do this. */
       *(.frame_buffer)
       *(.frame_buffer*)
       . = ALIGN(4);
@@ -165,8 +173,8 @@ SECTIONS
    {
       . = ALIGN(8);
       end = .;
-      . = . + _min_heap_size;
-      . = . + _min_stack_size;
+      . = . + _min_app_heap_size;
+      . = . + _min_app_stack_size;
       . = ALIGN(8);
       _estack = .;
    } > SRAM

@@ -1,10 +1,6 @@
 #ifndef __FW_TASKS_H
 #define __FW_TASKS_H
 
-#ifdef __cplusplus
-    extern "C" {
-#endif
-
 #include "FreeRTOS.h"
 #include "queue.h"
 
@@ -46,27 +42,42 @@ static_assert(sizeof(generic_resp_msg_t) == MAX_MSG_SIZE);
 // Task Init functions
 void main_task_init(void);
 void input_task_init(void);
+void lcd_task_init(void);
 void uart_task_init(void);
 
 // Task main functions
 void main_task(void *task_params);
 void input_task(void *task_params);
+void lcd_task(void *task_params);
 void uart_task(void *task_params);
 
 /* Task Queues, declared here for visibility, created in owning task */
 // Main Task
-extern QueueHandle_t main_req_queue;
-extern QueueHandle_t main_resp_queue;
+namespace main_queues
+{
+   extern QueueHandle_t req;
+   extern QueueHandle_t resp;
+}
 
 // Input Task
-extern QueueHandle_t input_req_queue;
-extern QueueHandle_t input_resp_queue;
+namespace input_queues
+{
+   extern QueueHandle_t req;
+   extern QueueHandle_t resp;
+}
+
+// LCD Task
+namespace lcd_queues
+{
+   extern QueueHandle_t req;
+   extern QueueHandle_t resp;
+}
 
 // UART Task
-extern QueueHandle_t uart_req_queue;
-extern QueueHandle_t uart_resp_queue;
-
-#ifdef __cplusplus
+namespace uart_queues
+{
+   extern QueueHandle_t req;
+   extern QueueHandle_t resp;
 }
-#endif
+
 #endif

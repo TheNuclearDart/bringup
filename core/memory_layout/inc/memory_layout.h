@@ -8,6 +8,7 @@
    #define ITCM_CODE __attribute__((section(".itcm_code")))
    #define DTCM_CODE __attribute__((section(".dtcm_code")))
    #define SRAM_CODE __attribute__((section(".sram_code")))
+   #define FRAME_BUFFER __attribute__((section(".frame_buffer")))
 #endif
 
 extern uint32_t __app_start__;
@@ -20,6 +21,7 @@ extern uint32_t __shared_data_end__;
 extern uint8_t  end;
 extern uint32_t _sfbuffer;
 extern uint32_t _efbuffer;
+extern uint8_t  _lvgl_mem;
 
 #ifdef __cplusplus
 constexpr uint32_t fw_image_size = 0x70000; // 256KB for now, not sure that this will work forever. Currently only have 240k reserved in memory map (as that is max SRAM size)

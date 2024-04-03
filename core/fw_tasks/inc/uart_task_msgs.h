@@ -1,10 +1,6 @@
 #ifndef __UART_TASK_MSGS_H
 #define __UART_TASK_MSGS_H
 
-#ifdef __cplusplus
-    extern "C" {
-#endif
-
 #include <stdint.h>
 
 #include "fw_tasks.h"
@@ -60,7 +56,4 @@ typedef struct _uart_resp_msg_u
    uart_xmodem_resp_t xmodem_resp;
 } uart_resp_msg_u;
 
-#ifdef __cplusplus
-}
-#endif
 #endif
