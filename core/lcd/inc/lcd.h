@@ -29,13 +29,15 @@ class LCD
       uint32_t get_vertical_res(void);
       color_depths get_color_depth(void);
       void set_pixel(uint32_t x, uint32_t y, lcd_pixel_t color);
+      void set_frame_buffer_addr(uint32_t frame_buffer_addr);
 
    private:
-      LTDC_HandleTypeDef ltdcInstance;
-      uint32_t           horizontal_res;
-      uint32_t           vertical_res;
-      color_depths       color_depth;
-      uint32_t           frame_buffer_address;
+      LTDC_HandleTypeDef   ltdcInstance;
+      uint32_t             horizontal_res;
+      uint32_t             vertical_res;
+      color_depths         color_depth;
+      uint32_t             frame_buffer_address;
+      LTDC_LayerCfgTypeDef layer_cfg;
 };
 
 #endif

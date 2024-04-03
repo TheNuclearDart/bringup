@@ -59,7 +59,7 @@ void LCD::init(uint32_t frame_buffer_address)
          assert_msg(0, "Error in HAL_LTDC_Init!\r\n");
       }
       this->frame_buffer_address = frame_buffer_address;
-      LTDC_LayerCfgTypeDef layer_cfg = 
+      this->layer_cfg = 
       {
          .WindowX0 = 0,
          .WindowX1 = 480,
@@ -80,7 +80,7 @@ void LCD::init(uint32_t frame_buffer_address)
             .Red = 0
          }
       };
-      this->config_layer(&layer_cfg);
+      this->config_layer(&this->layer_cfg);
    }
 }
 
@@ -109,7 +109,7 @@ uint32_t LCD::get_vertical_res(void)
 
 void LCD::flush(void)
 {
-   HAL_LTDC_Reload(&this->ltdcInstance, LTDC_RELOAD_VERTICAL_BLANKING);
+   HAL_LTDC_Reload(&this->ltdcInstance, LTDC_RELOAD_IMMEDIATE);
 }
 
 void LCD::set_pixel(uint32_t x, uint32_t y, lcd_pixel_t color)
@@ -140,4 +140,12 @@ void LCD::set_pixel(uint32_t x, uint32_t y, lcd_pixel_t color)
       default:
          assert_param(0);
    }
+}
+
+void LCD::set_frame_buffer_addr(uint32_t frame_buffer_addr)
+{
+   this->frame_buffer_address    = frame_buffer_addr;
+   this->layer_cfg.FBStartAdress = this->frame_buffer_address,
+   
+   this->config_layer(&layer_cfg);
 }

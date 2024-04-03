@@ -18,12 +18,12 @@ namespace lcd_queues
 
 namespace
 {
-   LCD                lcd(480, 272, LCD::color_depths::COLOR_DEPTH_16);
-   Print              lcd_print("lcd");
-   lv_color_t         buf1[(480 * 272) / 10];
-   lv_color_t         buf2[(480 * 272) / 10]; // There might be a better solution to all of this
-   lv_obj_t          *btn;
-   lv_disp_t         *disp;
+   LCD                     lcd(480, 272, LCD::color_depths::COLOR_DEPTH_24);
+   Print                   lcd_print("lcd");
+   FRAME_BUFFER lv_color_t buf1[480 * 272];
+   FRAME_BUFFER lv_color_t buf2[480 * 272]; // LVGL Direct mode requires screen sized buffers, but not sure if we even want to use that mode
+   lv_obj_t                *btn;
+   lv_disp_t               *disp;
 }
 
 // Basic implementation to start I guess
@@ -33,7 +33,7 @@ void lcd_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
    // Also need to look into DMA for this.
    // But that also means using the HAL_LTDC library correctly, which I don't seem to be
    // As this writes directly to the framebuffer (you can physically see the pixels drawing)
-   for (int32_t y = area->y1; y <= area->y2; y++)
+   /*for (int32_t y = area->y1; y <= area->y2; y++)
    {
       for (int32_t x = area->x1; x <= area->x2; x++)
       {
@@ -41,7 +41,10 @@ void lcd_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
          lcd.set_pixel(x, y, *color);
          color++;
       }
-   }
+   }*/
+
+   // 4/2024 According to LVGL, should just swap buffers when using full refresh. "This means in flush_cb, only the address of the frame buffer needs to be changed to the provided pointer (color_p @JDM I think this is now px_map)"
+   lcd.set_frame_buffer_addr(reinterpret_cast<uint32_t>(px_map));
    //lcd.flush(); // This is what is actually causing the hard fault.
                   // It doesn't seem necessary to draw the screen, but why is
                   // it causing issues? (And what is it's purpose anyway?)
@@ -65,7 +68,7 @@ void lcd_task_init(void)
 
    disp = lv_display_create(480, 272);
 
-   lv_display_set_buffers(disp, buf1, buf2, sizeof(buf1), LV_DISPLAY_RENDER_MODE_DIRECT);
+   lv_display_set_buffers(disp, buf1, buf2, sizeof(buf1), LV_DISPLAY_RENDER_MODE_DIRECT); // Direct mode requires screen sized buffers, but what mode should we even be using?
 
    lv_display_set_flush_cb(disp, lcd_flush);
 
@@ -94,9 +97,6 @@ void lcd_task(void *task_params)
 {
    using namespace lcd_queues;
 
-
-   lcd_print.out("Starting lcd task loop.\r\n");
-
    btn = lv_btn_create(lv_scr_act());
    if (btn == nullptr)
    {
@@ -106,7 +106,7 @@ void lcd_task(void *task_params)
    }
    volatile uint32_t x = 180;
    volatile uint32_t y = 111;
-   //setup_screen(btn, x, y);
+   setup_screen(btn, x, y);
 
    lcd_print.out("Starting lcd task loop.\r\n");
 

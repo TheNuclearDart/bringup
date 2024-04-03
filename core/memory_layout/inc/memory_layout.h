@@ -8,6 +8,7 @@
    #define ITCM_CODE __attribute__((section(".itcm_code")))
    #define DTCM_CODE __attribute__((section(".dtcm_code")))
    #define SRAM_CODE __attribute__((section(".sram_code")))
+   #define FRAME_BUFFER __attribute__((section(".frame_buffer")))
 #endif
 
 extern uint32_t __app_start__;

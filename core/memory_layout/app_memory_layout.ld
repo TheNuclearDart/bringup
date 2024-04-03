@@ -161,7 +161,7 @@ SECTIONS
    {
       . = ALIGN(4);
       _sfbuffer = .;
-      . = . + 0x80000;
+      /* Instead of assigning empty buffer, LVGL buffer arrays are assigned here. I believe this is the correct way to do this. */
       *(.frame_buffer)
       *(.frame_buffer*)
       . = ALIGN(4);
